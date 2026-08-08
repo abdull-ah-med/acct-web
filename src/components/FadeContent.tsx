@@ -1,0 +1,134 @@
+"use client";
+
+import * as React from "react";
+import { useRef, useEffect } from "react";
+import { gsap } from "gsap";
+
+interface FadeContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+  container?: Element | string | null;
+  blur?: boolean;
+  duration?: number;
+  ease?: string;
+  delay?: number;
+  threshold?: number;
+  initialOpacity?: number;
+  disappearAfter?: number;
+  disappearDuration?: number;
+  disappearEase?: string;
+  onComplete?: () => void;
+  onDisappearanceComplete?: () => void;
+}
+
+const FadeContent: React.FC<FadeContentProps> = ({
+  children,
+  blur = false,
+  duration = 800,
+  ease = "power2.out",
+  delay = 0,
+  threshold = 0.12,
+  initialOpacity = 0,
+  disappearAfter = 0,
+  disappearDuration = 0.5,
+  disappearEase = "power2.in",
+  onComplete,
+  onDisappearanceComplete,
+  className = "",
+  ...props
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      el.style.opacity = "1";
+      el.style.filter = "none";
+      el.style.visibility = "visible";
+      return;
+    }
+
+    const getSeconds = (val: number) => (val > 10 ? val / 1000 : val);
+    let played = false;
+
+    const play = () => {
+      if (played) return;
+      played = true;
+      gsap.fromTo(
+        el,
+        {
+          autoAlpha: initialOpacity,
+          filter: blur ? "blur(8px)" : "blur(0px)",
+        },
+        {
+          autoAlpha: 1,
+          filter: "blur(0px)",
+          duration: getSeconds(duration),
+          delay: getSeconds(delay),
+          ease,
+          onComplete: () => {
+            onComplete?.();
+            if (disappearAfter > 0) {
+              gsap.to(el, {
+                autoAlpha: initialOpacity,
+                filter: blur ? "blur(8px)" : "blur(0px)",
+                delay: getSeconds(disappearAfter),
+                duration: getSeconds(disappearDuration),
+                ease: disappearEase,
+                onComplete: () => onDisappearanceComplete?.(),
+              });
+            }
+          },
+        }
+      );
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          play();
+          observer.disconnect();
+        }
+      },
+      { threshold, rootMargin: "0px 0px -8% 0px" }
+    );
+
+    observer.observe(el);
+
+    // Fail-safe: never leave content invisible.
+    const fallback = window.setTimeout(play, 1200 + delay);
+
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(fallback);
+      gsap.killTweensOf(el);
+    };
+  }, [
+    blur,
+    delay,
+    disappearAfter,
+    disappearDuration,
+    disappearEase,
+    duration,
+    ease,
+    initialOpacity,
+    onComplete,
+    onDisappearanceComplete,
+    threshold,
+  ]);
+
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{ opacity: 0, visibility: "hidden" }}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+};
+
+export default FadeContent;
