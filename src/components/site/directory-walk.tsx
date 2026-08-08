@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import FadeContent from "@/components/FadeContent";
@@ -255,84 +255,102 @@ export function DirectoryWalk() {
             </div>
           </FadeContent>
 
-          <FadeContent delay={220}>
-            <div className="relative overflow-hidden rounded-lg border border-base-content/15 bg-base-100 p-5 sm:p-6">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={scene.id}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-                    <div id="demo-path">
-                      <p className="font-mono text-xs text-base-content/45">cwd</p>
-                      <p className="mt-1 font-mono text-lg text-base-content sm:text-xl">
-                        {scene.path}
-                      </p>
-                    </div>
-                    <span
-                      className={cn(
-                        "inline-flex items-center gap-1.5 font-mono text-xs",
-                        scene.state === "bound"
-                          ? "text-base-content"
-                          : "text-base-content/45"
-                      )}
-                      id="demo-enforce"
+          <FadeContent delay={220} className="h-full">
+            <div className="relative h-full overflow-hidden rounded-lg border border-base-content/15 bg-base-100 p-5 sm:p-6">
+              {/* Stack every scene in one grid cell so height stays at the tallest
+                  state (Downloads) and scene changes never push page content. */}
+              <div className="grid">
+                {scenes.map((s) => {
+                  const active = s.id === scene.id;
+                  return (
+                    <motion.div
+                      key={s.id}
+                      className="col-start-1 row-start-1"
+                      initial={false}
+                      animate={{
+                        opacity: active ? 1 : 0,
+                        y: active ? 0 : 8,
+                      }}
+                      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                      aria-hidden={!active}
+                      style={{ pointerEvents: active ? "auto" : "none" }}
                     >
-                      <span
-                        className={cn(
-                          "size-1.5 rounded-full",
-                          scene.state === "bound" ? "bg-base-content" : "bg-base-content/30"
-                        )}
-                        aria-hidden
-                      />
-                      {scene.state === "bound" ? "bound · local wins" : "unbound · fail closed"}
-                    </span>
-                  </div>
+                      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+                        <div id={active ? "demo-path" : undefined}>
+                          <p className="font-mono text-xs text-base-content/45">cwd</p>
+                          <p className="mt-1 font-mono text-lg text-base-content sm:text-xl">
+                            {s.path}
+                          </p>
+                        </div>
+                        <span
+                          className={cn(
+                            "inline-flex items-center gap-1.5 font-mono text-xs",
+                            s.state === "bound"
+                              ? "text-base-content"
+                              : "text-base-content/45"
+                          )}
+                          id={active ? "demo-enforce" : undefined}
+                        >
+                          <span
+                            className={cn(
+                              "size-1.5 rounded-full",
+                              s.state === "bound"
+                                ? "bg-base-content"
+                                : "bg-base-content/30"
+                            )}
+                            aria-hidden
+                          />
+                          {s.state === "bound"
+                            ? "bound · local wins"
+                            : "unbound · fail closed"}
+                        </span>
+                      </div>
 
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div
-                      id="demo-profile"
-                      className="rounded-lg border border-base-content/12 p-4"
-                    >
-                      <p className="font-mono text-xs text-base-content/45">profile</p>
-                      <p className="mt-2 font-display text-2xl font-semibold tracking-tight">
-                        {scene.profile ?? "none"}
-                      </p>
-                      <p className="mt-3 font-mono text-xs text-base-content/55">
-                        user.email → {scene.email}
-                      </p>
-                    </div>
-                    <div
-                      id="demo-token"
-                      className="rounded-lg border border-base-content/12 p-4"
-                    >
-                      <p className="font-mono text-xs text-base-content/45">auth</p>
-                      <p className="mt-2 font-mono text-sm text-base-content/80">
-                        GH_TOKEN · {scene.token}
-                      </p>
-                      <p className="mt-3 text-sm leading-relaxed text-base-content/55">
-                        {scene.note}
-                      </p>
-                    </div>
-                  </div>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div
+                          id={active ? "demo-profile" : undefined}
+                          className="rounded-lg border border-base-content/12 p-4"
+                        >
+                          <p className="font-mono text-xs text-base-content/45">
+                            profile
+                          </p>
+                          <p className="mt-2 font-display text-2xl font-semibold tracking-tight">
+                            {s.profile ?? "none"}
+                          </p>
+                          <p className="mt-3 font-mono text-xs text-base-content/55">
+                            user.email → {s.email}
+                          </p>
+                        </div>
+                        <div
+                          id={active ? "demo-token" : undefined}
+                          className="rounded-lg border border-base-content/12 p-4"
+                        >
+                          <p className="font-mono text-xs text-base-content/45">auth</p>
+                          <p className="mt-2 font-mono text-sm text-base-content/80">
+                            GH_TOKEN · {s.token}
+                          </p>
+                          <p className="mt-3 text-sm leading-relaxed text-base-content/55">
+                            {s.note}
+                          </p>
+                        </div>
+                      </div>
 
-                  <div className="mt-5 mockup-code w-full rounded-lg border border-base-content/12 bg-transparent text-sm">
-                    <pre data-prefix="$">
-                      <code>cd {scene.path}</code>
-                    </pre>
-                    <pre data-prefix=">">
-                      <code>
-                        {scene.profile
-                          ? `acct whoami → ${scene.profile}`
-                          : "acct whoami → unbound"}
-                      </code>
-                    </pre>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
+                      <div className="mt-5 mockup-code w-full rounded-lg border border-base-content/12 bg-transparent text-sm">
+                        <pre data-prefix="$">
+                          <code>cd {s.path}</code>
+                        </pre>
+                        <pre data-prefix=">">
+                          <code>
+                            {s.profile
+                              ? `acct whoami → ${s.profile}`
+                              : "acct whoami → unbound"}
+                          </code>
+                        </pre>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
             </div>
           </FadeContent>
         </div>
