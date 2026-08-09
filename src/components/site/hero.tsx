@@ -8,7 +8,7 @@ export function Hero() {
     <section className="relative flex min-h-[min(92vh,920px)] items-start overflow-hidden px-4 sm:px-6 lg:items-center">
       {/* Background: mobile */}
       <Image
-        src="/kamran-primaryayev-9V1cYW4JIfQ-unsplash.jpg"
+        src="/kamran-abdullayev-9V1cYW4JIfQ-unsplash.jpg"
         alt=""
         fill
         priority

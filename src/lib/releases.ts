@@ -1,4 +1,4 @@
-const REPO = "acct-sh/acct";
+const REPO = "abdull-ah-med/acct";
 const CHANGELOG_URL = `https://raw.githubusercontent.com/${REPO}/main/CHANGELOG.md`;
 const RELEASES_URL = `https://api.github.com/repos/${REPO}/releases?per_page=20`;
 const NPM_LATEST_URL = "https://registry.npmjs.org/acct-sh/latest";

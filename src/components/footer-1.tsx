@@ -16,7 +16,7 @@ const footerLinks = [
     name: "Docs",
     links: [
       {
-        href: "https://github.com/acct-sh/acct/blob/main/README.md",
+        href: "https://github.com/abdull-ah-med/acct/blob/main/README.md",
         label: "README",
       },
       {

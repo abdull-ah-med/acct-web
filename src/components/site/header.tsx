@@ -108,7 +108,7 @@ export function SiteHeader() {
 
         <div className="navbar-end gap-2">
           <a
-            href="https://github.com/acct-sh/acct"
+            href="https://github.com/abdull-ah-med/acct"
             className="btn btn-ghost btn-sm hidden font-sans text-base-content/60 sm:inline-flex"
             target="_blank"
             rel="noreferrer"

@@ -75,7 +75,7 @@ export default function FAQs() {
               <p className="mt-6 text-sm text-base-content/50">
                 Want the deep rules? Read the{" "}
                 <Link
-                  href="https://github.com/acct-sh/acct/blob/main/docs/invariants.md"
+                  href="https://github.com/abdull-ah-med/acct/blob/main/docs/invariants.md"
                   className="text-base-content font-medium underline-offset-4 hover:underline"
                   target="_blank"
                   rel="noreferrer"
@@ -84,7 +84,7 @@ export default function FAQs() {
                 </Link>{" "}
                 and{" "}
                 <Link
-                  href="https://github.com/acct-sh/acct/blob/main/docs/threat-model.md"
+                  href="https://github.com/abdull-ah-med/acct/blob/main/docs/threat-model.md"
                   className="text-base-content font-medium underline-offset-4 hover:underline"
                   target="_blank"
                   rel="noreferrer"

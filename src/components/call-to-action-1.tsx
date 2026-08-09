@@ -30,7 +30,7 @@ export default function CallToAction() {
                   Install acct
                 </Link>
                 <a
-                  href="https://github.com/acct-sh/acct"
+                  href="https://github.com/abdull-ah-med/acct"
                   target="_blank"
                   rel="noreferrer"
                   className="cta-btn cta-btn-outline"
