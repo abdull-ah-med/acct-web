@@ -8,6 +8,7 @@ const footerLinks = [
       { href: "#demo", id: "demo", label: "how it works" },
       { href: "#planes", id: "planes", label: "what it does" },
       { href: "#install", id: "install", label: "install" },
+      { href: "#releases", id: "releases", label: "releases" },
       { href: "#faq", id: "faq", label: "faq" },
     ],
   },
@@ -17,6 +18,10 @@ const footerLinks = [
       {
         href: "https://github.com/acct-sh/acct/blob/main/README.md",
         label: "README",
+      },
+      {
+        href: "https://github.com/acct-sh/acct/blob/main/CHANGELOG.md",
+        label: "Changelog",
       },
       {
         href: "https://github.com/acct-sh/acct/blob/main/docs/invariants.md",
@@ -36,6 +41,10 @@ const footerLinks = [
     name: "Community",
     links: [
       { href: "https://github.com/acct-sh/acct", label: "GitHub" },
+      {
+        href: "https://github.com/acct-sh/acct/releases",
+        label: "Releases",
+      },
       {
         href: "https://github.com/acct-sh/acct/issues",
         label: "Issues",
