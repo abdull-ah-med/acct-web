@@ -1,85 +1,7 @@
 import FadeContent from "@/components/FadeContent";
-import { getReleases, type Release } from "@/lib/releases";
+import { getReleases } from "@/lib/releases";
+import { ReleasesList } from "@/components/site/releases-list";
 import { ArrowUpRight } from "lucide-react";
-
-function formatDate(isoDate: string | null, publishedAt: string | null): string | null {
-  const raw = publishedAt ?? (isoDate ? `${isoDate}T12:00:00Z` : null);
-  if (!raw) return null;
-  const d = new Date(raw);
-  if (Number.isNaN(d.getTime())) return isoDate;
-  return d.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    timeZone: "UTC",
-  });
-}
-
-function ReleaseCard({ release, index }: { release: Release; index: number }) {
-  const dateLabel = release.isUnreleased
-    ? "in progress"
-    : formatDate(release.date, release.publishedAt);
-
-  return (
-    <FadeContent delay={Math.min(index * 70, 280)}>
-      <article className="border-b border-base-content/10 py-8 last:border-b-0 md:py-10">
-        <div className="grid gap-6 md:grid-cols-[10rem_1fr] md:gap-10 lg:grid-cols-[12rem_1fr]">
-          <div className="md:pt-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <a
-                href={release.htmlUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="font-mono text-sm text-base-content transition-colors hover:text-base-content/70"
-              >
-                {release.isUnreleased ? "next" : `v${release.version}`}
-              </a>
-              {release.isLatest ? (
-                <span className="font-mono text-[10px] tracking-[0.14em] text-base-content/50 uppercase">
-                  latest
-                </span>
-              ) : null}
-              {release.isUnreleased ? (
-                <span className="font-mono text-[10px] tracking-[0.14em] text-base-content/40 uppercase">
-                  unreleased
-                </span>
-              ) : null}
-            </div>
-            {dateLabel ? (
-              <p className="mt-2 font-mono text-xs text-base-content/40">{dateLabel}</p>
-            ) : null}
-          </div>
-
-          <div className="space-y-5">
-            {release.sections.length === 0 ? (
-              <p className="text-sm text-base-content/50">
-                See the GitHub release notes for details.
-              </p>
-            ) : (
-              release.sections.map((section) => (
-                <div key={`${release.version}-${section.title}`}>
-                  <p className="mb-2 font-mono text-[11px] tracking-[0.16em] text-base-content/40 uppercase">
-                    {section.title}
-                  </p>
-                  <ul className="space-y-2">
-                    {section.items.map((item, itemIndex) => (
-                      <li
-                        key={`${section.title}-${itemIndex}`}
-                        className="relative pl-4 text-sm leading-relaxed text-base-content/65 before:absolute before:top-[0.55em] before:left-0 before:size-1 before:rounded-full before:bg-base-content/35"
-                      >
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </article>
-    </FadeContent>
-  );
-}
 
 export async function Releases() {
   const { latestNpm, releases, changelogUrl, releasesUrl } = await getReleases();
@@ -164,11 +86,7 @@ export async function Releases() {
           </div>
         </FadeContent>
 
-        <div className="border-t border-base-content/10">
-          {releases.map((release, index) => (
-            <ReleaseCard key={release.version} release={release} index={index} />
-          ))}
-        </div>
+        <ReleasesList releases={releases} />
       </div>
     </section>
   );
