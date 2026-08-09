@@ -20,15 +20,15 @@ const footerLinks = [
         label: "README",
       },
       {
-        href: "https://github.com/acct-sh/acct/blob/main/CHANGELOG.md",
+        href: "https://github.com/abdull-ah-med/acct/blob/main/CHANGELOG.md",
         label: "Changelog",
       },
       {
-        href: "https://github.com/acct-sh/acct/blob/main/docs/invariants.md",
+        href: "https://github.com/abdull-ah-med/acct/blob/main/docs/invariants.md",
         label: "Invariants",
       },
       {
-        href: "https://github.com/acct-sh/acct/blob/main/docs/threat-model.md",
+        href: "https://github.com/abdull-ah-med/acct/blob/main/docs/threat-model.md",
         label: "Threat model",
       },
       {
@@ -40,13 +40,13 @@ const footerLinks = [
   {
     name: "Community",
     links: [
-      { href: "https://github.com/acct-sh/acct", label: "GitHub" },
+      { href: "https://github.com/abdull-ah-med/acct", label: "GitHub" },
       {
-        href: "https://github.com/acct-sh/acct/releases",
+        href: "https://github.com/abdull-ah-med/acct/releases",
         label: "Releases",
       },
       {
-        href: "https://github.com/acct-sh/acct/issues",
+        href: "https://github.com/abdull-ah-med/acct/issues",
         label: "Issues",
       },
     ],
