@@ -120,8 +120,9 @@ export function SiteHeader() {
         return;
       }
 
+      // Past the hero: default to the first section until a later one crosses the marker.
       const marker = scrollY + window.innerHeight * 0.33;
-      let current = "";
+      let current = sectionIds[0];
       for (const el of elements) {
         if (el.offsetTop <= marker) current = el.id;
       }
