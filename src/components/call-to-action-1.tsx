@@ -1,10 +1,21 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import FadeContent from "@/components/FadeContent";
 import GradientText from "@/components/GradientText";
+import { copyCommand, INSTALL_COMMAND } from "@/lib/terminal";
 
 export default function CallToAction() {
+  const [copied, setCopied] = useState(false);
+
+  const onCopy = async () => {
+    const ok = await copyCommand(INSTALL_COMMAND);
+    if (!ok) return;
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1500);
+  };
+
   return (
     <section className="px-4 py-20 sm:px-6 md:py-28">
       <div className="mx-auto max-w-7xl">
@@ -26,8 +37,16 @@ export default function CallToAction() {
                 Install once, bind your trees, and stop switching accounts by hand.
               </p>
               <div className="mt-8 flex flex-wrap justify-center gap-3">
-                <Link href="#install" className="cta-btn cta-btn-primary">
-                  Install acct
+                <button
+                  type="button"
+                  onClick={onCopy}
+                  className="cta-btn cta-btn-primary font-mono"
+                  aria-label={copied ? "Copied" : `Copy ${INSTALL_COMMAND}`}
+                >
+                  {copied ? "copied" : INSTALL_COMMAND}
+                </button>
+                <Link href="#install" className="cta-btn cta-btn-outline">
+                  Install steps
                 </Link>
                 <a
                   href="https://github.com/abdull-ah-med/acct"

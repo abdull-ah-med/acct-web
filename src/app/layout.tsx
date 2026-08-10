@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Syne } from "next/font/google";
+import { SmoothScroll } from "@/components/smooth-scroll";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -84,7 +85,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${syne.variable} ${ibmPlexMono.variable} dark h-full`}
       style={bodyFontStyle}
     >
-      <body className="min-h-full grain">{children}</body>
+      <body className="min-h-full grain">
+        <SmoothScroll>{children}</SmoothScroll>
+      </body>
     </html>
   );
 }

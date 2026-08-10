@@ -1,13 +1,29 @@
 "use client";
 
+import { useState } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "motion/react";
+import { copyCommand } from "@/lib/terminal";
 
 const Silk = dynamic(() => import("@/components/Silk"), { ssr: false });
 
+const HERO_INSTALL = "npm install acct-sh";
+
 export function Hero() {
+  const [copied, setCopied] = useState(false);
+
+  const onCopy = async () => {
+    const ok = await copyCommand(HERO_INSTALL);
+    if (!ok) return;
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1500);
+  };
+
   return (
-    <section className="relative flex min-h-[min(92vh,920px)] items-start overflow-hidden px-4 sm:px-6 lg:items-center">
+    <section
+      id="hero"
+      className="relative flex min-h-dvh items-center overflow-hidden px-4 sm:px-6"
+    >
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         <Silk
           speed={10}
@@ -23,7 +39,7 @@ export function Hero() {
         aria-hidden
       />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-stretch gap-10 pt-28 pb-20 text-left md:pt-14 lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:py-24">
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-stretch gap-10 py-28 text-left lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:py-24">
         <div className="max-w-2xl max-md:mx-auto max-md:w-full max-md:text-center md:mx-0">
           <motion.h1
             initial={{ opacity: 0, y: 18 }}
@@ -34,21 +50,10 @@ export function Hero() {
             acct
           </motion.h1>
 
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-5 max-md:flex max-md:justify-center"
-          >
-            <span className="inline-flex items-center rounded-md border border-base-content/15 bg-base-100/40 px-2.5 py-1 font-mono text-xs tracking-wide text-base-content/70 backdrop-blur-sm">
-              npm i -g acct-sh
-            </span>
-          </motion.div>
-
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
             className="font-display mt-6 max-w-xl text-2xl leading-snug font-medium tracking-tight text-base-content max-md:mx-auto sm:text-3xl md:text-4xl"
           >
             Switch GitHub accounts by folder. Automatically.
@@ -57,7 +62,7 @@ export function Hero() {
           <motion.p
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.65, delay: 0.26, ease: [0.22, 1, 0.36, 1] }}
             className="mt-5 max-w-lg text-base leading-relaxed text-base-content/70 max-md:mx-auto sm:text-lg"
           >
             Bind a directory to a GitHub user, email, and token. Open that folder and you are
@@ -68,12 +73,17 @@ export function Hero() {
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.42, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.6, delay: 0.38, ease: [0.22, 1, 0.36, 1] }}
             className="mt-8 flex flex-wrap items-center gap-3 max-md:justify-center"
           >
-            <a href="#install" className="cta-btn cta-btn-primary">
-              Install acct
-            </a>
+            <button
+              type="button"
+              onClick={onCopy}
+              className="cta-btn cta-btn-primary font-mono"
+              aria-label={copied ? "Copied" : `Copy ${HERO_INSTALL}`}
+            >
+              {copied ? "copied" : HERO_INSTALL}
+            </button>
             <a href="#demo" className="cta-btn cta-btn-outline">
               See how it works
             </a>

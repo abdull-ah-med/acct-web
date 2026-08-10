@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 import FadeContent from "@/components/FadeContent";
 import { Button } from "@/components/ui/button";
+import { runnableCommand } from "@/lib/terminal";
 import { cn } from "@/lib/utils";
 
 const blocks = [
@@ -47,7 +48,7 @@ export function Install() {
   const copy = async (key: string, text: string) => {
     await navigator.clipboard.writeText(text);
     setCopied(key);
-    window.setTimeout(() => setCopied(null), 1600);
+    window.setTimeout(() => setCopied(null), 1500);
   };
 
   return (
@@ -70,8 +71,8 @@ export function Install() {
           {blocks.map((block, i) => (
             <FadeContent key={block.key} delay={i * 90}>
               <div className="flex h-full flex-col overflow-hidden rounded-lg border border-base-content/15 bg-base-100">
-                <div className="flex items-center justify-between border-b border-base-content/10 px-4 py-3">
-                  <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between gap-2 border-b border-base-content/10 px-4 py-3">
+                  <div className="flex min-w-0 items-center gap-3">
                     <span className="font-mono text-xs text-base-content/40 tabular-nums">
                       {block.step}
                     </span>
@@ -82,8 +83,8 @@ export function Install() {
                   <Button
                     size="xs"
                     variant="ghost"
-                    className="rounded-md"
-                    onClick={() => copy(block.key, block.snippet)}
+                    className="rounded-full"
+                    onClick={() => copy(block.key, runnableCommand(block.snippet))}
                     aria-label={`Copy ${block.title}`}
                   >
                     {copied === block.key ? (
