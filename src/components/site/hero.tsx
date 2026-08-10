@@ -1,32 +1,25 @@
 "use client";
 
-import Image from "next/image";
+import dynamic from "next/dynamic";
 import { motion } from "motion/react";
+
+const Silk = dynamic(() => import("@/components/Silk"), { ssr: false });
 
 export function Hero() {
   return (
     <section className="relative flex min-h-[min(92vh,920px)] items-start overflow-hidden px-4 sm:px-6 lg:items-center">
-      {/* Background: mobile */}
-      <Image
-        src="/kamran-abdullayev-9V1cYW4JIfQ-unsplash.jpg"
-        alt=""
-        fill
-        priority
-        sizes="100vw"
-        className="pointer-events-none object-cover object-center md:hidden"
-      />
-      {/* Background: desktop */}
-      <Image
-        src="/andrew-kliatskyi--e_thdWzgis-unsplash.jpg"
-        alt=""
-        fill
-        priority
-        sizes="100vw"
-        className="pointer-events-none hidden object-cover object-center md:block"
-      />
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        <Silk
+          speed={10}
+          scale={1.2}
+          color="#4e5259"
+          noiseIntensity={5}
+          rotation={1.7}
+        />
+      </div>
       {/* Readability veil */}
       <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-base-100/70 via-base-100/45 to-base-100/85 md:bg-gradient-to-r md:from-base-100/80 md:via-base-100/50 md:to-base-100/20"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-base-100/55 via-base-100/35 to-base-100/75 md:bg-gradient-to-r md:from-base-100/65 md:via-base-100/35 md:to-base-100/15"
         aria-hidden
       />
 
