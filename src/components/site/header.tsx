@@ -362,8 +362,10 @@ export function SiteHeader() {
             ) : null}
           </AnimatePresence>
 
-          {/* Mobile: current → install → more */}
+          {/* Mobile: divider → current → install → more */}
           <div className="flex items-center gap-1 md:hidden">
+            <div className="mx-0.5 h-4 w-px shrink-0 bg-base-content/12" aria-hidden />
+
             <AnimatePresence mode="wait" initial={false}>
               {compact && activeLink ? (
                 <motion.a
@@ -373,7 +375,7 @@ export function SiteHeader() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.22, ease }}
-                  className="mr-1 max-w-30 truncate rounded-full bg-base-content/10 px-2.5 py-1.5 font-sans text-xs font-medium text-base-content"
+                  className="mr-1 inline-flex h-8 max-w-36 shrink items-center truncate rounded-full bg-base-content/10 px-3.5 font-sans text-sm font-medium text-base-content"
                   aria-current="true"
                 >
                   {activeLink.label}
