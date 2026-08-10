@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Syne } from "next/font/google";
+import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
 const syne = Syne({
@@ -16,18 +17,57 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "acct - Switch GitHub accounts by folder",
-  description:
-    "Bind a directory to a GitHub user, email, and token. Enter the folder and that account is active. Leave and it is gone.",
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: siteConfig.title,
+    template: `%s · ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  keywords: siteConfig.keywords,
+  applicationName: siteConfig.name,
+  authors: [{ name: siteConfig.name, url: siteConfig.github }],
+  creator: siteConfig.name,
+  publisher: siteConfig.name,
+  category: "technology",
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: [{ url: "/logo.svg", type: "image/svg+xml" }],
     shortcut: "/logo.svg",
     apple: "/logo.svg",
   },
   openGraph: {
-    title: "acct",
-    description: "Switch GitHub accounts by folder. Automatically.",
     type: "website",
+    locale: "en_US",
+    url: siteConfig.url,
+    siteName: siteConfig.name,
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [
+      {
+        url: "/logo.svg",
+        width: 1024,
+        height: 1024,
+        alt: "acct logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: ["/logo.svg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 

@@ -5,11 +5,11 @@ const footerLinks = [
   {
     name: "Product",
     links: [
-      { href: "#demo", id: "demo", label: "how it works" },
-      { href: "#planes", id: "planes", label: "what it does" },
-      { href: "#install", id: "install", label: "install" },
-      { href: "#releases", id: "releases", label: "releases" },
-      { href: "#faq", id: "faq", label: "faq" },
+      { href: "/#demo", id: "demo", label: "how it works" },
+      { href: "/#planes", id: "planes", label: "what it does" },
+      { href: "/#install", id: "install", label: "install" },
+      { href: "/#releases", id: "releases", label: "releases" },
+      { href: "/#faq", id: "faq", label: "faq" },
     ],
   },
   {
