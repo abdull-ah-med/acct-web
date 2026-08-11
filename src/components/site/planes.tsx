@@ -60,9 +60,9 @@ export function Planes() {
           {planes.map((plane, i) => {
             const Icon = plane.icon;
             return (
-              <FadeContent key={plane.title} delay={i * 70}>
+              <FadeContent key={plane.title} delay={i * 50}>
                 <SpotlightCard
-                  className="h-full rounded-box border border-base-content/10 bg-base-200/40 p-6"
+                  className="h-full rounded-box border border-base-content/10 bg-base-200/40 p-6 transition-[border-color] duration-200 ease-[var(--ease-out)]"
                   spotlightColor="rgba(255, 255, 255, 0.12)"
                 >
                   <Icon className="mb-5 size-5 text-base-content/70" strokeWidth={1.5} />

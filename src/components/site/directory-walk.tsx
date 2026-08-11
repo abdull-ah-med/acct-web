@@ -1,13 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import FadeContent from "@/components/FadeContent";
 import BlurText from "@/components/BlurText";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+const easeOut = [0.23, 1, 0.32, 1] as const;
 
 type Scene = {
   id: string;
@@ -52,6 +54,7 @@ const scenes: Scene[] = [
 export function DirectoryWalk() {
   const [index, setIndex] = useState(1);
   const [auto, setAuto] = useState(true);
+  const reduce = useReducedMotion();
   const scene = scenes[index];
 
   useEffect(() => {
@@ -211,15 +214,17 @@ export function DirectoryWalk() {
                   <li
                     key={`${node.depth}-${node.label}`}
                     className={cn(
-                      "flex items-center gap-2 px-2 py-1.5 transition-colors duration-300",
+                      "flex items-center gap-2 px-2 py-1.5 transition-colors duration-200 ease-[var(--ease-out)]",
                       node.active ? "text-base-content" : "text-base-content/45"
                     )}
                     style={{ paddingLeft: `${0.5 + node.depth * 0.85}rem` }}
                   >
                     <span
                       className={cn(
-                        "size-1.5 shrink-0 rounded-full",
-                        node.active ? "bg-base-content" : "bg-base-content/25"
+                        "size-1.5 shrink-0 rounded-full transition-[transform,opacity,background-color] duration-200 ease-[var(--ease-out)]",
+                        node.active
+                          ? "scale-100 bg-base-content opacity-100"
+                          : "scale-90 bg-base-content/25 opacity-70"
                       )}
                     />
                     <span>{node.label}</span>
@@ -232,7 +237,7 @@ export function DirectoryWalk() {
                 ))}
               </ul>
 
-              <div className="mt-6 flex flex-wrap gap-x-4 gap-y-2 border-t border-base-content/10 pt-4">
+              <div className="mt-6 flex flex-wrap gap-x-5 gap-y-3 border-t border-base-content/10 pt-4">
                 {scenes.map((s, i) => (
                   <button
                     key={s.id}
@@ -241,11 +246,12 @@ export function DirectoryWalk() {
                       setAuto(false);
                       setIndex(i);
                     }}
+                    data-active={i === index}
                     className={cn(
-                      "font-mono text-xs transition-colors",
+                      "scene-tab font-mono text-xs",
                       i === index
                         ? "text-base-content"
-                        : "text-base-content/35 hover:text-base-content/70"
+                        : "text-base-content/35 [@media(hover:hover)_and_(pointer:fine)]:hover:text-base-content/70"
                     )}
                   >
                     {s.path.replace("~/", "")}
@@ -267,11 +273,18 @@ export function DirectoryWalk() {
                       key={s.id}
                       className="col-start-1 row-start-1"
                       initial={false}
-                      animate={{
-                        opacity: active ? 1 : 0,
-                        y: active ? 0 : 8,
-                      }}
-                      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                      animate={
+                        reduce
+                          ? { opacity: active ? 1 : 0, filter: "blur(0px)" }
+                          : {
+                              opacity: active ? 1 : 0,
+                              filter: active ? "blur(0px)" : "blur(2px)",
+                              transform: active
+                                ? "translateY(0px)"
+                                : "translateY(8px)",
+                            }
+                      }
+                      transition={{ duration: reduce ? 0.15 : 0.28, ease: easeOut }}
                       aria-hidden={!active}
                       style={{ pointerEvents: active ? "auto" : "none" }}
                     >
@@ -295,7 +308,7 @@ export function DirectoryWalk() {
                             className={cn(
                               "size-1.5 rounded-full",
                               s.state === "bound"
-                                ? "bg-base-content"
+                                ? "status-pulse bg-base-content"
                                 : "bg-base-content/30"
                             )}
                             aria-hidden

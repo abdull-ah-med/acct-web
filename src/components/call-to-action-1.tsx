@@ -4,13 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import FadeContent from "@/components/FadeContent";
 import GradientText from "@/components/GradientText";
-import { copyCommand, INSTALL_COMMAND } from "@/lib/terminal";
+import { copyWithToast } from "@/lib/copy-toast";
+import { INSTALL_COMMAND } from "@/lib/terminal";
 
 export default function CallToAction() {
   const [copied, setCopied] = useState(false);
 
   const onCopy = async () => {
-    const ok = await copyCommand(INSTALL_COMMAND);
+    const ok = await copyWithToast(INSTALL_COMMAND);
     if (!ok) return;
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1500);

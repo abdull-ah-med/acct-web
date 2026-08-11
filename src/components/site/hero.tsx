@@ -2,22 +2,33 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { motion } from "motion/react";
-import { copyCommand } from "@/lib/terminal";
+import { motion, useReducedMotion } from "motion/react";
+import { copyWithToast } from "@/lib/copy-toast";
 
 const Silk = dynamic(() => import("@/components/Silk"), { ssr: false });
 
 const HERO_INSTALL = "npm install acct-sh";
+const easeOut = [0.23, 1, 0.32, 1] as const;
 
 export function Hero() {
   const [copied, setCopied] = useState(false);
+  const reduce = useReducedMotion();
 
   const onCopy = async () => {
-    const ok = await copyCommand(HERO_INSTALL);
+    const ok = await copyWithToast(HERO_INSTALL);
     if (!ok) return;
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1500);
   };
+
+  const enter = (y: number, delay: number, duration = 0.55) =>
+    reduce
+      ? { initial: false as const, animate: { opacity: 1 }, transition: { duration: 0.2 } }
+      : {
+          initial: { opacity: 0, transform: `translateY(${y}px)` },
+          animate: { opacity: 1, transform: "translateY(0px)" },
+          transition: { duration, delay, ease: easeOut },
+        };
 
   return (
     <section
@@ -33,7 +44,6 @@ export function Hero() {
           rotation={1.7}
         />
       </div>
-      {/* Readability veil */}
       <div
         className="pointer-events-none absolute inset-0 bg-gradient-to-b from-base-100/55 via-base-100/35 to-base-100/75 md:bg-gradient-to-r md:from-base-100/65 md:via-base-100/35 md:to-base-100/15"
         aria-hidden
@@ -42,27 +52,21 @@ export function Hero() {
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-stretch gap-10 py-28 text-left lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:py-24">
         <div className="max-w-2xl max-md:mx-auto max-md:w-full max-md:text-center md:mx-0">
           <motion.h1
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
+            {...enter(18, 0.05, 0.6)}
             className="font-display text-[clamp(3.25rem,12vw,7.5rem)] leading-[0.88] font-extrabold tracking-tight text-base-content max-md:text-center"
           >
             acct
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+            {...enter(14, 0.1, 0.55)}
             className="font-display mt-6 max-w-xl text-2xl leading-snug font-medium tracking-tight text-base-content max-md:mx-auto sm:text-3xl md:text-4xl"
           >
             Switch GitHub accounts by folder. Automatically.
           </motion.p>
 
           <motion.p
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.26, ease: [0.22, 1, 0.36, 1] }}
+            {...enter(12, 0.18, 0.5)}
             className="mt-5 max-w-lg text-base leading-relaxed text-base-content/70 max-md:mx-auto sm:text-lg"
           >
             Bind a directory to a GitHub user, email, and token. Open that folder and you are
@@ -71,9 +75,7 @@ export function Hero() {
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.38, ease: [0.22, 1, 0.36, 1] }}
+            {...enter(10, 0.26, 0.45)}
             className="mt-8 flex flex-wrap items-center gap-3 max-md:justify-center"
           >
             <button
@@ -91,9 +93,7 @@ export function Hero() {
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.85, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          {...enter(20, 0.22, 0.65)}
           className="w-full max-w-md max-md:mx-auto"
         >
           <div
@@ -103,7 +103,7 @@ export function Hero() {
             <div className="mb-4 flex items-center justify-between gap-3">
               <span className="font-mono text-xs text-base-content/45">acct status</span>
               <span className="inline-flex items-center gap-1.5 font-mono text-xs text-base-content">
-                <span className="size-1.5 rounded-full bg-base-content" aria-hidden />
+                <span className="status-pulse size-1.5 rounded-full bg-base-content" aria-hidden />
                 bound
               </span>
             </div>

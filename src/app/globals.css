@@ -121,6 +121,14 @@
   --sidebar-accent-foreground: oklch(94% 0 0);
   --sidebar-border: oklch(94% 0 0 / 10%);
   --sidebar-ring: oklch(94% 0 0);
+
+  /* Motion tokens — Emil Kowalski / animate skill */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --duration-press: 160ms;
+  --duration-popover: 200ms;
+  --duration-reveal: 480ms;
 }
 
 @layer base {
@@ -188,11 +196,11 @@
     letter-spacing: -0.01em;
     line-height: 1.2;
     transition:
-      transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-      background-color 0.25s ease,
-      border-color 0.25s ease,
-      color 0.25s ease,
-      box-shadow 0.25s ease;
+      transform var(--duration-press) var(--ease-out),
+      background-color 200ms ease,
+      border-color 200ms ease,
+      color 200ms ease,
+      box-shadow 200ms ease;
   }
 
   .cta-btn:active {
@@ -206,33 +214,79 @@
     box-shadow: 0 0 0 0 oklch(94% 0 0 / 0);
   }
 
-  .cta-btn-primary:hover {
-    transform: translateY(-2px);
-    background: oklch(100% 0 0);
-    box-shadow: 0 10px 28px oklch(94% 0 0 / 0.18);
-  }
-
   .cta-btn-outline {
     background: transparent;
     color: oklch(94% 0 0);
     border: 1px solid oklch(94% 0 0 / 0.28);
   }
 
-  .cta-btn-outline:hover {
-    transform: translateY(-2px);
-    border-color: oklch(94% 0 0 / 0.7);
-    background: oklch(94% 0 0 / 0.06);
-    box-shadow: 0 10px 28px oklch(0% 0 0 / 0.35);
+  @media (hover: hover) and (pointer: fine) {
+    .cta-btn-primary:hover {
+      transform: translateY(-2px);
+      background: oklch(100% 0 0);
+      box-shadow: 0 10px 28px oklch(94% 0 0 / 0.18);
+    }
+
+    .cta-btn-outline:hover {
+      transform: translateY(-2px);
+      border-color: oklch(94% 0 0 / 0.7);
+      background: oklch(94% 0 0 / 0.06);
+      box-shadow: 0 10px 28px oklch(0% 0 0 / 0.35);
+    }
+  }
+
+  .status-pulse {
+    animation: status-pulse 2.4s var(--ease-in-out) infinite;
+  }
+
+  @keyframes status-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.45;
+      transform: scale(0.85);
+    }
+  }
+
+  .scene-tab {
+    position: relative;
+    transition: color 200ms ease;
+  }
+
+  .scene-tab::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.35rem;
+    height: 1px;
+    background: oklch(94% 0 0);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--duration-popover) var(--ease-out);
+  }
+
+  .scene-tab[data-active="true"]::after {
+    transform: scaleX(1);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .cta-btn,
+    .cta-btn:active,
     .cta-btn-primary:hover,
-    .cta-btn-outline:hover,
-    .cta-btn:active {
-      transition: none;
+    .cta-btn-outline:hover {
       transform: none;
       box-shadow: none;
+    }
+
+    .status-pulse {
+      animation: none;
+    }
+
+    .scene-tab::after {
+      transition: none;
     }
   }
 }

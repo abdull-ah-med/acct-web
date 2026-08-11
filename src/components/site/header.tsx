@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, LayoutGroup, motion, useScroll } from "motion/react";
+import { AnimatePresence, LayoutGroup, motion, useReducedMotion, useScroll } from "motion/react";
 import { useLenis } from "lenis/react";
 import { Ellipsis, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,7 @@ const links = [
 
 type LinkItem = (typeof links)[number];
 
-const ease = [0.22, 1, 0.36, 1] as const;
+const ease = [0.23, 1, 0.32, 1] as const;
 
 function heroCompactThreshold() {
   const hero = document.getElementById("hero");
@@ -35,6 +35,7 @@ export function SiteHeader() {
   const ratiosRef = useRef<Map<string, number>>(new Map());
   const menuRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
+  const reduceMotion = useReducedMotion();
 
   const activeLink = useMemo(() => {
     if (!compact || !active) return null;
@@ -122,7 +123,7 @@ export function SiteHeader() {
 
       // Past the hero: default to the first section until a later one crosses the marker.
       const marker = scrollY + window.innerHeight * 0.33;
-      let current = sectionIds[0];
+      let current: string = sectionIds[0];
       for (const el of elements) {
         if (el.offsetTop <= marker) current = el.id;
       }
@@ -169,7 +170,7 @@ export function SiteHeader() {
   const InstallButton = () => (
     <a
       href="#install"
-      className="inline-flex h-8 shrink-0 items-center rounded-full bg-base-content px-3.5 font-sans text-sm font-medium text-base-100 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+      className="inline-flex h-8 shrink-0 items-center rounded-full bg-base-content px-3.5 font-sans text-sm font-medium text-base-100 transition-transform duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] [@media(hover:hover)_and_(pointer:fine)]:hover:scale-[1.02]"
       onClick={() => setMoreOpen(false)}
     >
       install
@@ -181,10 +182,23 @@ export function SiteHeader() {
       {moreOpen ? (
         <motion.div
           role="menu"
-          initial={{ opacity: 0, y: -8, scale: 0.96, filter: "blur(4px)" }}
-          animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-          exit={{ opacity: 0, y: -8, scale: 0.96, filter: "blur(4px)" }}
-          transition={{ duration: 0.22, ease }}
+          initial={
+            reduceMotion
+              ? { opacity: 0 }
+              : { opacity: 0, transform: "translateY(-6px) scale(0.96)" }
+          }
+          animate={
+            reduceMotion
+              ? { opacity: 1 }
+              : { opacity: 1, transform: "translateY(0px) scale(1)" }
+          }
+          exit={
+            reduceMotion
+              ? { opacity: 0 }
+              : { opacity: 0, transform: "translateY(-6px) scale(0.96)" }
+          }
+          transition={{ duration: 0.2, ease }}
+          style={{ transformOrigin: "top right" }}
           className={cn(
             "absolute top-[calc(100%+0.55rem)] right-0 z-50 min-w-46 overflow-hidden rounded-2xl border border-base-content/12 bg-base-100/95 p-1.5 shadow-[0_16px_40px_oklch(0%_0_0/0.45)] backdrop-blur-xl",
             desktop ? "hidden md:block" : "md:hidden"
@@ -195,11 +209,11 @@ export function SiteHeader() {
               key={link.id}
               role="menuitem"
               href={link.href}
-              initial={{ opacity: 0, x: 6 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.03, duration: 0.2, ease }}
+              initial={reduceMotion ? false : { opacity: 0, transform: "translateX(6px)" }}
+              animate={{ opacity: 1, transform: "translateX(0px)" }}
+              transition={{ delay: reduceMotion ? 0 : index * 0.03, duration: 0.18, ease }}
               className={cn(
-                "block rounded-xl px-3 py-2 font-sans text-sm transition-colors hover:bg-base-content/8 hover:text-base-content",
+                "block rounded-xl px-3 py-2 font-sans text-sm transition-colors [@media(hover:hover)_and_(pointer:fine)]:hover:bg-base-content/8 [@media(hover:hover)_and_(pointer:fine)]:hover:text-base-content",
                 active === link.id
                   ? "bg-base-content/8 font-medium text-base-content"
                   : "text-base-content/65"
@@ -215,7 +229,7 @@ export function SiteHeader() {
             href="https://github.com/abdull-ah-med/acct"
             target="_blank"
             rel="noreferrer"
-            className="block rounded-xl px-3 py-2 font-sans text-sm text-base-content/65 transition-colors hover:bg-base-content/8 hover:text-base-content"
+            className="block rounded-xl px-3 py-2 font-sans text-sm text-base-content/65 transition-colors [@media(hover:hover)_and_(pointer:fine)]:hover:bg-base-content/8 [@media(hover:hover)_and_(pointer:fine)]:hover:text-base-content"
             onClick={() => setMoreOpen(false)}
           >
             github
@@ -347,10 +361,18 @@ export function SiteHeader() {
                     <AnimatePresence mode="wait" initial={false}>
                       <motion.span
                         key={moreOpen ? "close" : "more"}
-                        initial={{ opacity: 0, rotate: -45, scale: 0.8 }}
-                        animate={{ opacity: 1, rotate: 0, scale: 1 }}
-                        exit={{ opacity: 0, rotate: 45, scale: 0.8 }}
-                        transition={{ duration: 0.18 }}
+                        initial={
+                          reduceMotion
+                            ? { opacity: 0 }
+                            : { opacity: 0, transform: "rotate(-30deg) scale(0.95)" }
+                        }
+                        animate={{ opacity: 1, transform: "rotate(0deg) scale(1)" }}
+                        exit={
+                          reduceMotion
+                            ? { opacity: 0 }
+                            : { opacity: 0, transform: "rotate(30deg) scale(0.95)" }
+                        }
+                        transition={{ duration: 0.16, ease }}
                         className="inline-flex"
                       >
                         {moreOpen ? <X className="size-4" /> : <Ellipsis className="size-4" />}

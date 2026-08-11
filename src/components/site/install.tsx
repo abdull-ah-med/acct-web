@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 import FadeContent from "@/components/FadeContent";
 import { Button } from "@/components/ui/button";
+import { copyWithToast } from "@/lib/copy-toast";
 import { runnableCommand } from "@/lib/terminal";
 import { cn } from "@/lib/utils";
 
@@ -45,8 +46,9 @@ acct whoami`,
 export function Install() {
   const [copied, setCopied] = useState<string | null>(null);
 
-  const copy = async (key: string, text: string) => {
-    await navigator.clipboard.writeText(text);
+  const copy = async (key: string, text: string, title: string) => {
+    const ok = await copyWithToast(text, { success: `${title} copied` });
+    if (!ok) return;
     setCopied(key);
     window.setTimeout(() => setCopied(null), 1500);
   };
@@ -69,7 +71,7 @@ export function Install() {
 
         <div className="grid gap-4 lg:grid-cols-3">
           {blocks.map((block, i) => (
-            <FadeContent key={block.key} delay={i * 90}>
+            <FadeContent key={block.key} delay={i * 60}>
               <div className="flex h-full flex-col overflow-hidden rounded-lg border border-base-content/15 bg-base-100">
                 <div className="flex items-center justify-between gap-2 border-b border-base-content/10 px-4 py-3">
                   <div className="flex min-w-0 items-center gap-3">
@@ -84,7 +86,9 @@ export function Install() {
                     size="xs"
                     variant="ghost"
                     className="rounded-full"
-                    onClick={() => copy(block.key, runnableCommand(block.snippet))}
+                    onClick={() =>
+                      copy(block.key, runnableCommand(block.snippet), block.title)
+                    }
                     aria-label={`Copy ${block.title}`}
                   >
                     {copied === block.key ? (

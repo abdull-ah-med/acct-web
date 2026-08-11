@@ -49,9 +49,9 @@ export function Problem() {
         </FadeContent>
 
         <div className="grid gap-px overflow-hidden rounded-box border border-base-content/10 bg-base-content/10 sm:grid-cols-2">
-          {leaks.map((item, i) => (
-            <FadeContent key={item.title} delay={i * 80}>
-              <article className="h-full bg-base-100 p-6 sm:p-8">
+            {leaks.map((item, i) => (
+            <FadeContent key={item.title} delay={i * 55}>
+              <article className="h-full bg-base-100 p-6 transition-[background-color] duration-200 ease-[var(--ease-out)] sm:p-8 [@media(hover:hover)_and_(pointer:fine)]:hover:bg-base-200/40">
                 <h3 className="font-display text-xl font-semibold tracking-tight text-base-content">
                   {item.title}
                 </h3>

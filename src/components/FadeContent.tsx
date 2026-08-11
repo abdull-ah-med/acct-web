@@ -20,17 +20,18 @@ interface FadeContentProps extends React.HTMLAttributes<HTMLDivElement> {
   onDisappearanceComplete?: () => void;
 }
 
+/** Marketing scroll reveal: opacity + translateY (and optional blur). Once. */
 const FadeContent: React.FC<FadeContentProps> = ({
   children,
   blur = false,
-  duration = 800,
+  duration = 480,
   ease = "power2.out",
   delay = 0,
   threshold = 0.12,
   initialOpacity = 0,
   disappearAfter = 0,
   disappearDuration = 0.5,
-  disappearEase = "power2.in",
+  disappearEase = "power2.out",
   onComplete,
   onDisappearanceComplete,
   className = "",
@@ -46,6 +47,7 @@ const FadeContent: React.FC<FadeContentProps> = ({
     if (reduce) {
       el.style.opacity = "1";
       el.style.filter = "none";
+      el.style.transform = "none";
       el.style.visibility = "visible";
       return;
     }
@@ -60,10 +62,12 @@ const FadeContent: React.FC<FadeContentProps> = ({
         el,
         {
           autoAlpha: initialOpacity,
-          filter: blur ? "blur(8px)" : "blur(0px)",
+          y: 12,
+          filter: blur ? "blur(6px)" : "blur(0px)",
         },
         {
           autoAlpha: 1,
+          y: 0,
           filter: "blur(0px)",
           duration: getSeconds(duration),
           delay: getSeconds(delay),
@@ -73,7 +77,8 @@ const FadeContent: React.FC<FadeContentProps> = ({
             if (disappearAfter > 0) {
               gsap.to(el, {
                 autoAlpha: initialOpacity,
-                filter: blur ? "blur(8px)" : "blur(0px)",
+                y: -6,
+                filter: blur ? "blur(6px)" : "blur(0px)",
                 delay: getSeconds(disappearAfter),
                 duration: getSeconds(disappearDuration),
                 ease: disappearEase,
@@ -97,7 +102,6 @@ const FadeContent: React.FC<FadeContentProps> = ({
 
     observer.observe(el);
 
-    // Fail-safe: never leave content invisible.
     const fallback = window.setTimeout(play, 1200 + delay);
 
     return () => {
