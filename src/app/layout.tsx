@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Mono, Syne } from "next/font/google";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { Toaster } from "@/components/toaster";
+import { JsonLd } from "@/components/json-ld";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -25,41 +26,57 @@ export const metadata: Metadata = {
     template: `%s · ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  keywords: siteConfig.keywords,
+  keywords: [...siteConfig.keywords],
   applicationName: siteConfig.name,
-  authors: [{ name: siteConfig.name, url: siteConfig.github }],
-  creator: siteConfig.name,
+  authors: [{ name: "Abdullah Ahmed", url: siteConfig.github }],
+  creator: "Abdullah Ahmed",
   publisher: siteConfig.name,
   category: "technology",
+  classification: "Developer Tools",
+  referrer: "origin-when-cross-origin",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   alternates: {
     canonical: "/",
+    types: {
+      "text/plain": [
+        { url: "/llms.txt", title: "LLM index" },
+        { url: "/llms-full.txt", title: "LLM full context" },
+      ],
+      "text/markdown": [{ url: "/agents.md", title: "Agent instructions" }],
+    },
   },
   icons: {
     icon: [{ url: "/logo.svg", type: "image/svg+xml" }],
     shortcut: "/logo.svg",
     apple: "/logo.svg",
   },
+  manifest: "/manifest.webmanifest",
   openGraph: {
     type: "website",
-    locale: "en_US",
+    locale: siteConfig.locale,
     url: siteConfig.url,
     siteName: siteConfig.name,
     title: siteConfig.title,
     description: siteConfig.description,
     images: [
       {
-        url: "/logo.svg",
-        width: 1024,
-        height: 1024,
-        alt: "acct logo",
+        url: siteConfig.ogImage.url,
+        width: siteConfig.ogImage.width,
+        height: siteConfig.ogImage.height,
+        alt: siteConfig.ogImage.alt,
+        type: "image/jpeg",
       },
     ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: siteConfig.title,
     description: siteConfig.description,
-    images: ["/logo.svg"],
+    images: [siteConfig.ogImage.url],
   },
   robots: {
     index: true,
@@ -69,7 +86,13 @@ export const metadata: Metadata = {
       follow: true,
       "max-image-preview": "large",
       "max-snippet": -1,
+      "max-video-preview": -1,
     },
+  },
+  other: {
+    "llm:index": `${siteConfig.url}/llms.txt`,
+    "llm:full": `${siteConfig.url}/llms-full.txt`,
+    "ai:agents": `${siteConfig.url}/agents.md`,
   },
 };
 
@@ -87,6 +110,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       style={bodyFontStyle}
     >
       <body className="min-h-full grain">
+        <JsonLd />
         <SmoothScroll>{children}</SmoothScroll>
         <Toaster />
       </body>

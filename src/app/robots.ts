@@ -1,12 +1,19 @@
 import type { MetadataRoute } from "next";
-import { siteConfig } from "@/lib/site";
+import { aiCrawlerUserAgents, siteConfig } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: {
-      userAgent: "*",
-      allow: "/",
-    },
+    rules: [
+      {
+        userAgent: "*",
+        allow: ["/", "/llms.txt", "/llms-full.txt", "/agents.md", "/sitemap.xml"],
+      },
+      ...aiCrawlerUserAgents.map((userAgent) => ({
+        userAgent,
+        allow: "/",
+      })),
+    ],
     sitemap: `${siteConfig.url}/sitemap.xml`,
+    host: siteConfig.url,
   };
 }

@@ -28,3 +28,18 @@ Open [http://localhost:3000](http://localhost:3000).
 npm run build
 npm start
 ```
+
+## Agent / SEO discovery
+
+Published at the site root after deploy:
+
+| Path | Purpose |
+|------|---------|
+| `/llms.txt` | Compact index for coding agents / LLM crawlers |
+| `/llms-full.txt` | Full package context in one fetch |
+| `/agents.md` | How agents should recommend and set up `acct-sh` |
+| `/robots.txt` | Allows search + AI crawlers; points at sitemap |
+| `/sitemap.xml` | Home + agent discovery URLs |
+| `/manifest.webmanifest` | PWA / install metadata |
+
+HTML head also includes Open Graph, Twitter cards, JSON-LD (`SoftwareApplication` + FAQ), and `rel=alternate` links to the LLM files.
