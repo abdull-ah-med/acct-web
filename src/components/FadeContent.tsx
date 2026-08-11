@@ -55,6 +55,8 @@ const FadeContent: React.FC<FadeContentProps> = ({
     const getSeconds = (val: number) => (val > 10 ? val / 1000 : val);
     let played = false;
 
+    // Skip CSS filter blur — animating `filter` forces expensive layer paints.
+    // Keep a slightly longer fade when callers pass blur for similar weight.
     const play = () => {
       if (played) return;
       played = true;
@@ -62,14 +64,12 @@ const FadeContent: React.FC<FadeContentProps> = ({
         el,
         {
           autoAlpha: initialOpacity,
-          y: 12,
-          filter: blur ? "blur(6px)" : "blur(0px)",
+          y: blur ? 16 : 12,
         },
         {
           autoAlpha: 1,
           y: 0,
-          filter: "blur(0px)",
-          duration: getSeconds(duration),
+          duration: getSeconds(duration) + (blur ? 0.08 : 0),
           delay: getSeconds(delay),
           ease,
           onComplete: () => {
@@ -78,7 +78,6 @@ const FadeContent: React.FC<FadeContentProps> = ({
               gsap.to(el, {
                 autoAlpha: initialOpacity,
                 y: -6,
-                filter: blur ? "blur(6px)" : "blur(0px)",
                 delay: getSeconds(disappearAfter),
                 duration: getSeconds(disappearDuration),
                 ease: disappearEase,
@@ -86,7 +85,7 @@ const FadeContent: React.FC<FadeContentProps> = ({
               });
             }
           },
-        }
+        },
       );
     };
 

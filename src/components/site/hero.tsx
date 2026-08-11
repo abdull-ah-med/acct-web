@@ -1,14 +1,92 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "motion/react";
 import { copyWithToast } from "@/lib/copy-toast";
 
-const Silk = dynamic(() => import("@/components/Silk"), { ssr: false });
+const Silk = dynamic(() => import("@/components/Silk"), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 bg-[#2a2c30]" aria-hidden />,
+});
 
 const HERO_INSTALL = "npm install acct-sh";
 const easeOut = [0.23, 1, 0.32, 1] as const;
+
+function HeroBackdrop() {
+  const reduce = useReducedMotion();
+  const hostRef = useRef<HTMLDivElement>(null);
+  const [ready, setReady] = useState(false);
+  const [inView, setInView] = useState(true);
+  const [pageVisible, setPageVisible] = useState(true);
+
+  useEffect(() => {
+    if (reduce) return;
+
+    let idleId: number | undefined;
+    let timeoutId: number | undefined;
+
+    const start = () => setReady(true);
+
+    if (typeof window.requestIdleCallback === "function") {
+      idleId = window.requestIdleCallback(start, { timeout: 500 });
+    } else {
+      timeoutId = window.setTimeout(start, 120);
+    }
+
+    return () => {
+      if (idleId !== undefined && typeof window.cancelIdleCallback === "function") {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+    };
+  }, [reduce]);
+
+  useEffect(() => {
+    const el = hostRef.current;
+    if (!el || reduce) return;
+
+    const io = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting && entry.intersectionRatio > 0.02),
+      { threshold: [0, 0.02, 0.1], rootMargin: "10% 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [reduce]);
+
+  useEffect(() => {
+    const onVis = () => setPageVisible(document.visibilityState === "visible");
+    onVis();
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+
+  if (reduce) {
+    return (
+      <div
+        className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_40%,#3a3d44_0%,#141414_55%,#0a0a0a_100%)]"
+        aria-hidden
+      />
+    );
+  }
+
+  return (
+    <div ref={hostRef} className="absolute inset-0 contain-paint" aria-hidden>
+      {ready ? (
+        <Silk
+          speed={8}
+          scale={1.15}
+          color="#4e5259"
+          noiseIntensity={3.5}
+          rotation={1.7}
+          active={inView && pageVisible}
+        />
+      ) : (
+        <div className="absolute inset-0 bg-[#2a2c30]" />
+      )}
+    </div>
+  );
+}
 
 export function Hero() {
   const [copied, setCopied] = useState(false);
@@ -36,13 +114,7 @@ export function Hero() {
       className="relative flex min-h-dvh items-center overflow-hidden px-4 sm:px-6"
     >
       <div className="pointer-events-none absolute inset-0" aria-hidden>
-        <Silk
-          speed={10}
-          scale={1.2}
-          color="#4e5259"
-          noiseIntensity={5}
-          rotation={1.7}
-        />
+        <HeroBackdrop />
       </div>
       <div
         className="pointer-events-none absolute inset-0 bg-gradient-to-b from-base-100/55 via-base-100/35 to-base-100/75 md:bg-gradient-to-r md:from-base-100/65 md:via-base-100/35 md:to-base-100/15"
@@ -92,12 +164,10 @@ export function Hero() {
           </motion.div>
         </div>
 
-        <motion.div
-          {...enter(20, 0.22, 0.65)}
-          className="w-full max-w-md max-md:mx-auto"
-        >
+        <motion.div {...enter(20, 0.22, 0.65)} className="w-full max-w-md max-md:mx-auto">
+          {/* Solid translucent panel — backdrop-blur over WebGL is a major compositor cost */}
           <div
-            className="relative overflow-hidden rounded-lg border border-base-content/15 bg-base-100/70 p-5 backdrop-blur-md"
+            className="relative overflow-hidden rounded-lg border border-base-content/15 bg-base-100/92 p-5"
             id="hero-status"
           >
             <div className="mb-4 flex items-center justify-between gap-3">

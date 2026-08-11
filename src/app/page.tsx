@@ -1,14 +1,27 @@
 import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { SiteHeader } from "@/components/site/header";
 import { Hero } from "@/components/site/hero";
-import { DirectoryWalk } from "@/components/site/directory-walk";
-import { Problem } from "@/components/site/problem";
-import { Planes } from "@/components/site/planes";
-import { Install } from "@/components/site/install";
 import { Releases, ReleasesFallback } from "@/components/site/releases";
-import FAQs from "@/components/faqs-1";
-import CallToAction from "@/components/call-to-action-1";
 import Footer from "@/components/footer-1";
+
+// Below-fold client sections — keep the hero chunk small.
+const DirectoryWalk = dynamic(
+  () =>
+    import("@/components/site/directory-walk").then((m) => m.DirectoryWalk),
+  { loading: () => <section className="min-h-[28rem]" aria-hidden /> },
+);
+const Problem = dynamic(() =>
+  import("@/components/site/problem").then((m) => m.Problem),
+);
+const Planes = dynamic(() =>
+  import("@/components/site/planes").then((m) => m.Planes),
+);
+const Install = dynamic(() =>
+  import("@/components/site/install").then((m) => m.Install),
+);
+const FAQs = dynamic(() => import("@/components/faqs-1"));
+const CallToAction = dynamic(() => import("@/components/call-to-action-1"));
 
 export default function Home() {
   return (

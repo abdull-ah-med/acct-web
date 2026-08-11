@@ -53,12 +53,14 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       root
       options={{
         autoRaf: true,
-        lerp: 0.085,
+        // Slightly snappier lerp = fewer interpolated frames fighting WebGL.
+        lerp: 0.12,
         // Intentionally no default `duration` — a fixed duration makes
         // long-page programmatic scrolls feel like an abrupt snap.
         smoothWheel: true,
         anchors: false,
         stopInertiaOnNavigate: true,
+        syncTouch: false,
       }}
     >
       <LenisBridge />

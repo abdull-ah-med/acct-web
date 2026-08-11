@@ -47,22 +47,27 @@ export function SiteHeader() {
     [activeLink]
   );
 
+  // Cache threshold — querying layout every Lenis frame was a steady main-thread tax.
+  const compactThresholdRef = useRef(0);
+
+  useEffect(() => {
+    const refreshThreshold = () => {
+      compactThresholdRef.current = heroCompactThreshold();
+      setCompact(window.scrollY >= compactThresholdRef.current);
+    };
+    refreshThreshold();
+    window.addEventListener("resize", refreshThreshold);
+    return () => window.removeEventListener("resize", refreshThreshold);
+  }, []);
+
   useLenis((lenis) => {
-    setCompact(lenis.scroll >= heroCompactThreshold());
+    const next = lenis.scroll >= compactThresholdRef.current;
+    setCompact((prev) => (prev === next ? prev : next));
   });
 
   useEffect(() => {
     if (!compact) setMoreOpen(false);
   }, [compact]);
-
-  useEffect(() => {
-    const updateMode = () => {
-      setCompact(window.scrollY >= heroCompactThreshold());
-    };
-    updateMode();
-    window.addEventListener("resize", updateMode);
-    return () => window.removeEventListener("resize", updateMode);
-  }, []);
 
   useEffect(() => {
     setMoreOpen(false);
@@ -101,7 +106,7 @@ export function SiteHeader() {
     }
 
     const pickActive = (scrollY = window.scrollY) => {
-      if (scrollY < heroCompactThreshold()) {
+      if (scrollY < compactThresholdRef.current) {
         setActive("");
         return;
       }

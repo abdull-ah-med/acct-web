@@ -1,32 +1,36 @@
-'use client';
+"use client";
 
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { forwardRef, useRef, useMemo, useLayoutEffect, useEffect } from 'react';
-import { Color } from 'three';
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import {
+  forwardRef,
+  useRef,
+  useMemo,
+  useLayoutEffect,
+  useEffect,
+  useState,
+} from "react";
 
-const hexToNormalizedRGB = hex => {
-  hex = hex.replace('#', '');
+const hexToNormalizedRGB = (hex) => {
+  const h = hex.replace("#", "");
   return [
-    parseInt(hex.slice(0, 2), 16) / 255,
-    parseInt(hex.slice(2, 4), 16) / 255,
-    parseInt(hex.slice(4, 6), 16) / 255
+    parseInt(h.slice(0, 2), 16) / 255,
+    parseInt(h.slice(2, 4), 16) / 255,
+    parseInt(h.slice(4, 6), 16) / 255,
   ];
 };
 
-const vertexShader = `
+const vertexShader = /* glsl */ `
 varying vec2 vUv;
-varying vec3 vPosition;
 
 void main() {
-  vPosition = position;
   vUv = uv;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
 
-const fragmentShader = `
+// Slightly cheaper noise (fewer sin calls) — still reads as silk.
+const fragmentShader = /* glsl */ `
 varying vec2 vUv;
-varying vec3 vPosition;
 
 uniform float uTime;
 uniform vec3  uColor;
@@ -35,34 +39,29 @@ uniform float uScale;
 uniform float uRotation;
 uniform float uNoiseIntensity;
 
-const float e = 2.71828182845904523536;
-
 float noise(vec2 texCoord) {
-  float G = e;
-  vec2  r = (G * sin(G * texCoord));
-  return fract(r.x * r.y * (1.0 + texCoord.x));
+  vec2 r = sin(texCoord * 12.9898);
+  return fract(r.x * r.y * 43758.5453);
 }
 
 vec2 rotateUvs(vec2 uv, float angle) {
   float c = cos(angle);
   float s = sin(angle);
-  mat2  rot = mat2(c, -s, s, c);
-  return rot * uv;
+  return mat2(c, -s, s, c) * uv;
 }
 
 void main() {
-  float rnd        = noise(gl_FragCoord.xy);
-  vec2  uv         = rotateUvs(vUv * uScale, uRotation);
-  vec2  tex        = uv * uScale;
-  float tOffset    = uSpeed * uTime;
+  float rnd = noise(gl_FragCoord.xy * 0.5);
+  vec2 uv = rotateUvs(vUv * uScale, uRotation);
+  float tOffset = uSpeed * uTime;
 
-  tex.y += 0.03 * sin(8.0 * tex.x - tOffset);
+  uv.y += 0.03 * sin(8.0 * uv.x - tOffset);
 
   float pattern = 0.6 +
-                  0.4 * sin(5.0 * (tex.x + tex.y +
-                                   cos(3.0 * tex.x + 5.0 * tex.y) +
-                                   0.02 * tOffset) +
-                           sin(20.0 * (tex.x + tex.y - 0.1 * tOffset)));
+    0.4 * sin(
+      5.0 * (uv.x + uv.y + cos(3.0 * uv.x + 5.0 * uv.y) + 0.02 * tOffset) +
+      sin(16.0 * (uv.x + uv.y - 0.1 * tOffset))
+    );
 
   vec4 col = vec4(uColor, 1.0) * vec4(pattern) - rnd / 15.0 * uNoiseIntensity;
   col.a = 1.0;
@@ -70,55 +69,109 @@ void main() {
 }
 `;
 
-const SilkPlane = forwardRef(function SilkPlane({ uniforms }, ref) {
+const SilkPlane = forwardRef(function SilkPlane({ uniforms, fps }, ref) {
   const { viewport } = useThree();
+  const accum = useRef(0);
+  const minDelta = 1 / Math.max(12, fps);
 
   useLayoutEffect(() => {
     if (ref.current) {
       ref.current.scale.set(viewport.width, viewport.height, 1);
     }
-  }, [ref, viewport]);
+  }, [ref, viewport.width, viewport.height]);
 
   useFrame((_, delta) => {
-    ref.current.material.uniforms.uTime.value += 0.1 * delta;
+    const mesh = ref.current;
+    if (!mesh) return;
+    accum.current += delta;
+    if (accum.current < minDelta) return;
+    const step = Math.min(accum.current, 0.08);
+    accum.current = 0;
+    mesh.material.uniforms.uTime.value += 0.1 * step;
   });
 
   return (
     <mesh ref={ref}>
       <planeGeometry args={[1, 1, 1, 1]} />
-      <shaderMaterial uniforms={uniforms} vertexShader={vertexShader} fragmentShader={fragmentShader} />
+      <shaderMaterial
+        uniforms={uniforms}
+        vertexShader={vertexShader}
+        fragmentShader={fragmentShader}
+        depthWrite={false}
+        depthTest={false}
+      />
     </mesh>
   );
 });
-SilkPlane.displayName = 'SilkPlane';
+SilkPlane.displayName = "SilkPlane";
 
-const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, rotation = 0 }) => {
+/**
+ * Full-bleed silk shader background.
+ * `active` pauses the WebGL loop when the hero is off-screen / tab hidden.
+ */
+const Silk = ({
+  speed = 5,
+  scale = 1,
+  color = "#7B7481",
+  noiseIntensity = 1.5,
+  rotation = 0,
+  active = true,
+}) => {
   const meshRef = useRef();
+  const [dpr, setDpr] = useState(1);
+  const [fps, setFps] = useState(28);
+
+  useEffect(() => {
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    const saveData = navigator.connection?.saveData === true;
+    const cores = navigator.hardwareConcurrency || 4;
+    const lowPower = saveData || cores <= 4 || coarse;
+
+    // Cap pixel ratio hard — hero fills the viewport; 2x DPR is the main lag source.
+    setDpr(lowPower ? 1 : Math.min(1.25, window.devicePixelRatio || 1));
+    setFps(lowPower ? 20 : 28);
+  }, []);
 
   const uniforms = useMemo(
     () => ({
       uSpeed: { value: speed },
       uScale: { value: scale },
       uNoiseIntensity: { value: noiseIntensity },
-      uColor: { value: new Color(...hexToNormalizedRGB(color)) },
+      uColor: { value: hexToNormalizedRGB(color) },
       uRotation: { value: rotation },
-      uTime: { value: 0 }
+      uTime: { value: 0 },
     }),
+    // Mount-time defaults; live props synced below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   useEffect(() => {
     uniforms.uSpeed.value = speed;
     uniforms.uScale.value = scale;
     uniforms.uNoiseIntensity.value = noiseIntensity;
-    uniforms.uColor.value.setRGB(...hexToNormalizedRGB(color));
+    uniforms.uColor.value = hexToNormalizedRGB(color);
     uniforms.uRotation.value = rotation;
   }, [speed, scale, noiseIntensity, color, rotation, uniforms]);
 
   return (
-    <Canvas dpr={[1, 2]} frameloop="always">
-      <SilkPlane ref={meshRef} uniforms={uniforms} />
+    <Canvas
+      dpr={dpr}
+      frameloop={active ? "always" : "never"}
+      gl={{
+        antialias: false,
+        alpha: false,
+        depth: false,
+        stencil: false,
+        powerPreference: "high-performance",
+        failIfMajorPerformanceCaveat: false,
+      }}
+      camera={{ position: [0, 0, 1], fov: 75, near: 0.1, far: 10 }}
+      style={{ width: "100%", height: "100%", display: "block" }}
+      // Avoid resizing thrash while soft-keyboard / URL bar moves on mobile.
+      resize={{ debounce: 200, scroll: false }}
+    >
+      <SilkPlane ref={meshRef} uniforms={uniforms} fps={fps} />
     </Canvas>
   );
 };
