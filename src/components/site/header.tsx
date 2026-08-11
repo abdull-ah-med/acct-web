@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion, useScroll } from "motion/react";
 import { useLenis } from "lenis/react";
 import { Ellipsis, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { HomeBrandLink } from "@/components/home-brand-link";
 
 const links = [
   { href: "#demo", id: "demo", label: "how it works" },
@@ -259,20 +259,14 @@ export function SiteHeader() {
           )}
         >
           <motion.div layout="position" transition={{ layout: { duration: 0.38, ease } }}>
-            <Link
-              href="/"
-              className="flex shrink-0 items-center gap-2 rounded-full px-1.5 py-1"
-              aria-label="acct home"
-              onClick={() => {
+            <HomeBrandLink
+              className="shrink-0 rounded-full px-1.5 py-1"
+              labelClassName="text-[15px]"
+              onNavigate={() => {
                 setMoreOpen(false);
                 setActive("");
               }}
-            >
-              <Image src="/logo.svg" alt="" width={24} height={24} className="rounded-sm" />
-              <span className="text-[15px] font-semibold tracking-tight text-base-content">
-                acct
-              </span>
-            </Link>
+            />
           </motion.div>
 
           {/* Desktop wide (hero) */}

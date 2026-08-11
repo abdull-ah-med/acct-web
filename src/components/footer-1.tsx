@@ -1,6 +1,5 @@
-import Image from "next/image";
-import Link from "next/link";
 import { BackToTopButton } from "@/components/back-to-top";
+import { HomeBrandLink } from "@/components/home-brand-link";
 
 const footerLinks = [
   {
@@ -60,12 +59,7 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4 pt-12 pb-6 sm:px-6 md:pt-16 md:pb-8">
         <div className="flex flex-col items-center gap-4 text-center md:flex-row md:items-start md:justify-between md:text-left">
           <div className="mx-auto max-w-sm md:mx-0 md:max-w-none">
-            <Link href="/" className="inline-flex items-center gap-2.5" aria-label="acct home">
-              <Image src="/logo.svg" alt="" width={28} height={28} className="rounded-sm" />
-              <span className="text-lg font-semibold tracking-tight text-base-content">
-                acct
-              </span>
-            </Link>
+            <HomeBrandLink imageSize={28} labelClassName="text-lg" className="gap-2.5" />
             <p className="mt-3 text-sm leading-relaxed text-base-content/50 md:whitespace-nowrap">
               Bind folders to GitHub accounts so commits, pushes, and gh stay on the right
               identity.
