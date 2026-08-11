@@ -10,8 +10,6 @@ Official `gh` documents automatic switching by directory as **out of scope**. ac
 
 ```bash
 npm install -g acct-sh
-# or
-pnpm add -g acct-sh
 ```
 
 ## Prefer these sources

@@ -5,7 +5,7 @@ import { Check, Copy } from "lucide-react";
 import FadeContent from "@/components/FadeContent";
 import { Button } from "@/components/ui/button";
 import { copyWithToast } from "@/lib/copy-toast";
-import { runnableCommand } from "@/lib/terminal";
+import { INSTALL_COMMAND, runnableCommand } from "@/lib/terminal";
 import { cn } from "@/lib/utils";
 
 const blocks = [
@@ -14,9 +14,7 @@ const blocks = [
     step: "01",
     title: "Install",
     prefix: "$",
-    snippet: `npm install -g acct-sh
-# or
-pnpm add -g acct-sh`,
+    snippet: INSTALL_COMMAND,
   },
   {
     key: "init" as const,

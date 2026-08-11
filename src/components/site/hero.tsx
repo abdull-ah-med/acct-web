@@ -4,13 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "motion/react";
 import { copyWithToast } from "@/lib/copy-toast";
+import { INSTALL_COMMAND } from "@/lib/terminal";
 
 const Silk = dynamic(() => import("@/components/Silk"), {
   ssr: false,
   loading: () => <div className="absolute inset-0 bg-[#2a2c30]" aria-hidden />,
 });
 
-const HERO_INSTALL = "npm install acct-sh";
 const easeOut = [0.23, 1, 0.32, 1] as const;
 
 function HeroBackdrop() {
@@ -93,7 +93,7 @@ export function Hero() {
   const reduce = useReducedMotion();
 
   const onCopy = async () => {
-    const ok = await copyWithToast(HERO_INSTALL);
+    const ok = await copyWithToast(INSTALL_COMMAND);
     if (!ok) return;
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1500);
@@ -154,9 +154,9 @@ export function Hero() {
               type="button"
               onClick={onCopy}
               className="cta-btn cta-btn-primary font-mono"
-              aria-label={copied ? "Copied" : `Copy ${HERO_INSTALL}`}
+              aria-label={copied ? "Copied" : `Copy ${INSTALL_COMMAND}`}
             >
-              {copied ? "copied" : HERO_INSTALL}
+              {copied ? "copied" : INSTALL_COMMAND}
             </button>
             <a href="#demo" className="cta-btn cta-btn-outline">
               See how it works

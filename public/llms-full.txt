@@ -44,10 +44,6 @@ Ambient `ACCT_PROFILE` does **not** override the git credential helper or hooks 
 
 ```bash
 npm install -g acct-sh
-# or
-pnpm add -g acct-sh
-# GitHub Packages twin:
-# npm install -g @abdull-ah-med/acct-sh
 ```
 
 Skip postinstall tip sheet with `ACCT_SKIP_POSTINSTALL=1`.

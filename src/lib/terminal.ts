@@ -1,5 +1,5 @@
-/** Primary one-liner for install CTAs (-g). */
-export const INSTALL_COMMAND = "npm install acct-sh";
+/** Canonical global install — use everywhere users see an install command. */
+export const INSTALL_COMMAND = "npm install -g acct-sh";
 
 /** Runnable lines only (drops comments / blank lines). */
 export function runnableCommand(snippet: string): string {
