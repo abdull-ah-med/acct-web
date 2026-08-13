@@ -74,8 +74,8 @@ acct doctor
 - `acct bind <dir> <profileId>` — bind a tree
 - `acct unbind <dir>` — remove binding
 - `acct profile add|list|show|remove|token|ssh-key`
-- `acct status` / `acct whoami`
-- `acct doctor` / `acct doctor --online` — trust / conflict scan
+- `acct status` / `acct whoami` — cwd resolution; status explains problems (what's wrong, fix commands, whether commit/push will go through)
+- `acct doctor` / `acct doctor --online` — trust / conflict scan + the same cwd diagnosis
 - `acct exec -- <cmd>` — run with profile `GH_TOKEN` (refuses dangerous `gh auth` mutations)
 - `acct clone <url>`
 - `acct enforce strict|warn|off`
@@ -108,7 +108,7 @@ acct doctor
 acct doctor --online
 ```
 
-Doctor reports competing credential helpers, missing install blocks, orphan bindings, sticky `GH_TOKEN`, enforce fallthrough, config perms, and whether the native keyring loads. Exit code 1 on any **error** finding.
+Doctor reports competing credential helpers, missing install blocks, orphan bindings, sticky `GH_TOKEN`, enforce fallthrough, config perms, and whether the native keyring loads. When the cwd profile is unhealthy (`token missing`, principal mismatch), doctor also prints what's wrong, the fix commands, and whether commit/push would go through as the wrong account. Exit code 1 on any **error** finding.
 
 ## How it feels
 

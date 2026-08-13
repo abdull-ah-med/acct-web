@@ -49,7 +49,8 @@ Do not invent ambient env overrides that beat directory resolution. Ambient `ACC
 
 | Symptom | First command |
 |---------|----------------|
-| Wrong account in a folder | `acct status` then `acct doctor` |
+| Wrong account in a folder | `acct status` then `acct doctor` — both print what's wrong, fix commands, and whether commit/push will go through |
+| `token: missing` / `LEAK RISK` | Import the profile PAT: `gh auth login --user <profile-user>` then `acct profile token <id> --import-gh`. In `strict`, push is blocked; commit uses includeIf identity (not the other GitHub login). Raw `gh` without `acct exec` is the leak. |
 | Sticky token after leaving a tree | `acct doctor`; ensure shell hook is installed |
 | Competing osxkeychain / libsecret / gh helpers | `acct doctor` → `acct install` |
 | Keychain / secrets issues | `acct doctor` (look for `keyring-*` / `secrets-json-*`) |

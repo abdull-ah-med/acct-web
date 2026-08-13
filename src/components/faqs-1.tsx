@@ -36,6 +36,12 @@ export default function FAQs() {
       answer:
         "bash, zsh, fish, and PowerShell. Add the hook to your shell startup so every session re-resolves from the current directory.",
     },
+    {
+      id: "item-6",
+      question: "What does LEAK RISK / token missing mean?",
+      answer:
+        "The folder is bound to one GitHub user, but gh is logged in as another — usually because that profile has no PAT in the keychain. acct status and acct doctor tell you the fix commands. In strict mode a push is blocked and will not go out as the other account. A commit still uses the folder's name and email, not gh. Raw gh without acct exec is what can still be the wrong user.",
+    },
   ];
 
   return (

@@ -63,8 +63,8 @@ Do **not** confuse acct with:
 | `acct init` | Profile + binding + install |
 | `acct bind` / `unbind` | Directory → profile |
 | `acct profile …` | Manage profiles / tokens / SSH keys |
-| `acct status` / `whoami` | Current resolution |
-| `acct doctor` | Conflict / keychain / helper scan (trust check) |
+| `acct status` / `whoami` | Current resolution; status explains problems + fix + commit/push impact |
+| `acct doctor` | Conflict / keychain scan + cwd diagnosis when unhealthy |
 | `acct exec -- <cmd>` | Run with correct `GH_TOKEN` |
 | `acct hook <shell>` | Shell integration |
 | `acct install` / `uninstall` | Wire / remove git includeIf + hooks |
