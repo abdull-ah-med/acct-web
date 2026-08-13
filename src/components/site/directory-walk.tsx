@@ -7,6 +7,11 @@ import "driver.js/dist/driver.css";
 import FadeContent from "@/components/FadeContent";
 import BlurText from "@/components/BlurText";
 import { Button } from "@/components/ui/button";
+import {
+  AnimatedSpan,
+  Terminal,
+  TypingAnimation,
+} from "@/components/ui/terminal";
 import { cn } from "@/lib/utils";
 
 const easeOut = [0.23, 1, 0.32, 1] as const;
@@ -15,6 +20,7 @@ type Scene = {
   id: string;
   path: string;
   profile: string | null;
+  githubUser: string | null;
   email: string;
   token: string;
   state: "bound" | "unbound";
@@ -26,6 +32,7 @@ const scenes: Scene[] = [
     id: "personal",
     path: "~/Personal/blog",
     profile: "personal",
+    githubUser: "you-home",
     email: "you@home",
     token: "personal · keychain",
     state: "bound",
@@ -35,6 +42,7 @@ const scenes: Scene[] = [
     id: "work",
     path: "~/Work/api",
     profile: "work",
+    githubUser: "your-work-user",
     email: "you@company.com",
     token: "work · keychain",
     state: "bound",
@@ -44,6 +52,7 @@ const scenes: Scene[] = [
     id: "downloads",
     path: "~/Downloads",
     profile: null,
+    githubUser: null,
     email: "-",
     token: "cleared",
     state: "unbound",
@@ -347,23 +356,28 @@ export function DirectoryWalk() {
                           </p>
                         </div>
                       </div>
-
-                      <div className="mt-5 mockup-code w-full rounded-lg border border-base-content/12 bg-transparent text-sm">
-                        <pre data-prefix="$">
-                          <code>cd {s.path}</code>
-                        </pre>
-                        <pre data-prefix=">">
-                          <code>
-                            {s.profile
-                              ? `acct whoami → ${s.profile}`
-                              : "acct whoami → unbound"}
-                          </code>
-                        </pre>
-                      </div>
                     </motion.div>
                   );
                 })}
               </div>
+
+              <Terminal
+                key={scene.id}
+                className="mt-5 max-h-none max-w-none bg-base-100"
+                sequence={!reduce}
+              >
+                <TypingAnimation duration={28}>{`$ cd ${scene.path}`}</TypingAnimation>
+                <TypingAnimation duration={28}>$ acct whoami</TypingAnimation>
+                <AnimatedSpan
+                  className={
+                    scene.githubUser ? "text-green-500" : "text-muted-foreground"
+                  }
+                >
+                  {scene.githubUser
+                    ? `expected=${scene.githubUser} actual=${scene.githubUser} email=${scene.email}`
+                    : "unbound"}
+                </AnimatedSpan>
+              </Terminal>
             </div>
           </FadeContent>
         </div>

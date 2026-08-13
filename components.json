@@ -23,6 +23,10 @@
   "menuAccent": "subtle",
   "registries": {
     "@tailark-oss": "https://oss.tailark.com/r/{name}.json",
-    "@react-bits": "https://reactbits.dev/r/{name}.json"
+    "@react-bits": "https://reactbits.dev/r/{name}.json",
+    "@magicui": "https://magicui.design/r/{name}.json",
+    "@reactbits-pro": {
+      "url": "https://pro.reactbits.dev/api/r/pro/{name}.json"
+    }
   }
 }

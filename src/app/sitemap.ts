@@ -9,6 +9,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "weekly",
       priority: 1,
+      images: [`${siteConfig.url}${siteConfig.ogImage.url}`],
+    },
+    {
+      url: `${siteConfig.url}/privacy`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.3,
     },
     {
       url: `${siteConfig.url}/llms.txt`,

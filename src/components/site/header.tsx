@@ -9,11 +9,11 @@ import { cn } from "@/lib/utils";
 import { HomeBrandLink } from "@/components/home-brand-link";
 
 const links = [
-  { href: "#demo", id: "demo", label: "how it works" },
-  { href: "#planes", id: "planes", label: "what it does" },
-  { href: "#install", id: "install", label: "install" },
-  { href: "#releases", id: "releases", label: "releases" },
-  { href: "#faq", id: "faq", label: "faq" },
+  { href: "/#demo", id: "demo", label: "how it works" },
+  { href: "/#planes", id: "planes", label: "what it does" },
+  { href: "/#install", id: "install", label: "install" },
+  { href: "/#releases", id: "releases", label: "releases" },
+  { href: "/#faq", id: "faq", label: "faq" },
 ] as const;
 
 type LinkItem = (typeof links)[number];
@@ -173,13 +173,13 @@ export function SiteHeader() {
     );
 
   const InstallButton = () => (
-    <a
-      href="#install"
+    <Link
+      href="/#install"
       className="inline-flex h-8 shrink-0 items-center rounded-full bg-base-content px-3.5 font-sans text-sm font-medium text-base-100 transition-transform duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] [@media(hover:hover)_and_(pointer:fine)]:hover:scale-[1.02]"
       onClick={() => setMoreOpen(false)}
     >
       install
-    </a>
+    </Link>
   );
 
   const moreMenu = (items: readonly LinkItem[], desktop = false) => (

@@ -5,6 +5,11 @@ import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "motion/react";
 import { copyWithToast } from "@/lib/copy-toast";
 import { INSTALL_COMMAND } from "@/lib/terminal";
+import {
+  AnimatedSpan,
+  Terminal,
+  TypingAnimation,
+} from "@/components/ui/terminal";
 
 const Silk = dynamic(() => import("@/components/Silk"), {
   ssr: false,
@@ -164,38 +169,34 @@ export function Hero() {
           </motion.div>
         </div>
 
-        <motion.div {...enter(20, 0.22, 0.65)} className="w-full max-w-md max-md:mx-auto">
-          {/* Solid translucent panel — backdrop-blur over WebGL is a major compositor cost */}
-          <div
-            className="relative overflow-hidden rounded-lg border border-base-content/15 bg-base-100/92 p-5"
-            id="hero-status"
+        <motion.div {...enter(20, 0.22, 0.65)} className="w-full max-w-lg max-md:mx-auto">
+          <Terminal
+            className="max-h-none max-w-none bg-base-100"
+            sequence={!reduce}
           >
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <span className="font-mono text-xs text-base-content/45">acct status</span>
-              <span className="inline-flex items-center gap-1.5 font-mono text-xs text-base-content">
-                <span className="status-pulse size-1.5 rounded-full bg-base-content" aria-hidden />
-                bound
-              </span>
-            </div>
-            <dl className="space-y-3 font-mono text-sm">
-              <div className="flex justify-between gap-4 border-b border-base-content/10 pb-2">
-                <dt className="text-base-content/45">cwd</dt>
-                <dd className="truncate text-right text-base-content">~/Work/api</dd>
-              </div>
-              <div className="flex justify-between gap-4 border-b border-base-content/10 pb-2">
-                <dt className="text-base-content/45">profile</dt>
-                <dd className="text-base-content">work</dd>
-              </div>
-              <div className="flex justify-between gap-4 border-b border-base-content/10 pb-2">
-                <dt className="text-base-content/45">user.email</dt>
-                <dd className="truncate text-right text-base-content/80">you@company.com</dd>
-              </div>
-              <div className="flex justify-between gap-4">
-                <dt className="text-base-content/45">token</dt>
-                <dd className="text-base-content/70">keychain · work only</dd>
-              </div>
-            </dl>
-          </div>
+            <TypingAnimation duration={28}>$ cd ~/Work/api</TypingAnimation>
+            <TypingAnimation duration={28}>$ acct status</TypingAnimation>
+            <AnimatedSpan className="text-muted-foreground">
+              cwd: /Users/you/Work/api
+            </AnimatedSpan>
+            <AnimatedSpan className="text-muted-foreground">reason: binding</AnimatedSpan>
+            <AnimatedSpan className="text-muted-foreground">enforce: strict</AnimatedSpan>
+            <AnimatedSpan className="text-muted-foreground">
+              binding: /Users/you/Work
+            </AnimatedSpan>
+            <AnimatedSpan className="text-muted-foreground">profile: work</AnimatedSpan>
+            <AnimatedSpan className="text-muted-foreground">
+              github: your-work-user@github.com
+            </AnimatedSpan>
+            <AnimatedSpan className="text-muted-foreground">
+              identity: Your Name &lt;you@company.com&gt;
+            </AnimatedSpan>
+            <AnimatedSpan className="text-muted-foreground">protocol: https</AnimatedSpan>
+            <AnimatedSpan className="text-green-500">token: present (keychain)</AnimatedSpan>
+            <AnimatedSpan className="text-muted-foreground">
+              auth principal: your-work-user
+            </AnimatedSpan>
+          </Terminal>
         </motion.div>
       </div>
 

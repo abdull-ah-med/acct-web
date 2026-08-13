@@ -51,6 +51,10 @@ const footerLinks = [
       },
     ],
   },
+  {
+    name: "Legal",
+    links: [{ href: "/privacy", label: "Privacy" }],
+  },
 ];
 
 export default function Footer() {
@@ -69,7 +73,7 @@ export default function Footer() {
           <BackToTopButton />
         </div>
 
-        <div className="mt-10 grid grid-cols-3 gap-x-4 gap-y-8 border-t border-base-content/10 pt-10 sm:gap-x-8 lg:gap-x-12">
+        <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-8 border-t border-base-content/10 pt-10 sm:grid-cols-4 sm:gap-x-8 lg:gap-x-12">
           {footerLinks.map((group) => (
             <nav key={group.name} aria-label={group.name}>
               <p className="font-mono text-[10px] tracking-[0.18em] text-base-content/40 uppercase sm:text-[11px]">

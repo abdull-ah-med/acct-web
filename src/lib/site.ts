@@ -48,10 +48,10 @@ export const siteConfig = {
   install: "npm install -g acct-sh",
   locale: "en_US",
   ogImage: {
-    url: "/og.jpg",
-    width: 1200,
-    height: 690,
-    alt: "acct — one folder, one GitHub account, no leaks",
+    url: "/og.jpeg",
+    width: 2720,
+    height: 972,
+    alt: "acct — switch GitHub accounts by folder",
   },
 } as const;
 

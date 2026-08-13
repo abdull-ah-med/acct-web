@@ -3,24 +3,27 @@
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 import FadeContent from "@/components/FadeContent";
+import {
+  AnimatedSpan,
+  Terminal,
+  TypingAnimation,
+} from "@/components/ui/terminal";
 import { Button } from "@/components/ui/button";
 import { copyWithToast } from "@/lib/copy-toast";
 import { INSTALL_COMMAND, runnableCommand } from "@/lib/terminal";
-import { cn } from "@/lib/utils";
+import { useReducedMotion } from "motion/react";
 
 const blocks = [
   {
     key: "install" as const,
     step: "01",
     title: "Install",
-    prefix: "$",
     snippet: INSTALL_COMMAND,
   },
   {
     key: "init" as const,
     step: "02",
     title: "Init + bind",
-    prefix: "$",
     snippet: `acct init \\
   --id work \\
   --user your-work-user \\
@@ -33,7 +36,6 @@ const blocks = [
     key: "hook" as const,
     step: "03",
     title: "Hook + verify",
-    prefix: "$",
     snippet: `eval "$(acct hook zsh)"
 cd ~/Work/some-repo
 acct status
@@ -43,6 +45,7 @@ acct whoami`,
 
 export function Install() {
   const [copied, setCopied] = useState<string | null>(null);
+  const reduce = useReducedMotion();
 
   const copy = async (key: string, text: string, title: string) => {
     const ok = await copyWithToast(text, { success: `${title} copied` });
@@ -70,43 +73,33 @@ export function Install() {
         <div className="grid gap-4 lg:grid-cols-3">
           {blocks.map((block, i) => (
             <FadeContent key={block.key} delay={i * 60}>
-              <div className="flex h-full flex-col overflow-hidden rounded-lg border border-base-content/15 bg-base-100">
-                <div className="flex items-center justify-between gap-2 border-b border-base-content/10 px-4 py-3">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <span className="font-mono text-xs text-base-content/40 tabular-nums">
-                      {block.step}
-                    </span>
-                    <span className="font-mono text-xs text-base-content/70">
-                      {block.title}
-                    </span>
-                  </div>
-                  <Button
-                    size="xs"
-                    variant="ghost"
-                    className="rounded-full"
-                    onClick={() =>
-                      copy(block.key, runnableCommand(block.snippet), block.title)
-                    }
-                    aria-label={`Copy ${block.title}`}
-                  >
-                    {copied === block.key ? (
-                      <Check className="size-3.5 text-base-content" />
-                    ) : (
-                      <Copy className="size-3.5" />
-                    )}
-                  </Button>
-                </div>
-                <div className="mockup-code flex-1 rounded-none bg-transparent text-xs sm:text-sm">
-                  {block.snippet.split("\n").map((line, idx) => (
-                    <pre
-                      key={`${block.key}-${idx}`}
-                      data-prefix={line.startsWith("#") ? "#" : block.prefix}
-                      className={cn(line.startsWith("#") && "text-base-content/40")}
-                    >
-                      <code>{line.replace(/^#\s?/, "")}</code>
-                    </pre>
-                  ))}
-                </div>
+              <div className="relative h-full">
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  className="absolute top-3 right-3 z-10 rounded-full"
+                  onClick={() =>
+                    copy(block.key, runnableCommand(block.snippet), block.title)
+                  }
+                  aria-label={`Copy ${block.title}`}
+                >
+                  {copied === block.key ? (
+                    <Check className="size-3.5 text-base-content" />
+                  ) : (
+                    <Copy className="size-3.5" />
+                  )}
+                </Button>
+                <Terminal
+                  className="h-full max-h-none max-w-none bg-base-100"
+                  sequence={!reduce}
+                >
+                  <AnimatedSpan className="text-muted-foreground">
+                    {block.step} · {block.title}
+                  </AnimatedSpan>
+                  <TypingAnimation duration={22}>
+                    {`$ ${block.snippet}`}
+                  </TypingAnimation>
+                </Terminal>
               </div>
             </FadeContent>
           ))}
