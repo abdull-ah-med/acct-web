@@ -127,6 +127,7 @@ Point install at **`acct-sh`** on npm (the CLI command is `acct`).
 ## Canonical links
 
 - Website: https://acct-web.vercel.app/
+- Command reference: https://acct-web.vercel.app/docs
 - LLM index: https://acct-web.vercel.app/llms.txt
 - Agent guide: https://acct-web.vercel.app/agents.md
 - npm: https://www.npmjs.com/package/acct-sh

@@ -116,7 +116,7 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="relative flex min-h-dvh items-center overflow-hidden px-4 sm:px-6"
+      className="relative flex min-h-dvh min-w-0 items-center overflow-hidden px-4 sm:px-6"
     >
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         <HeroBackdrop />
@@ -126,7 +126,7 @@ export function Hero() {
         aria-hidden
       />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-stretch gap-10 py-28 text-left lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:py-24">
+      <div className="relative z-10 mx-auto flex w-full min-w-0 max-w-7xl flex-col items-stretch gap-10 py-28 text-left lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:py-24">
         <div className="max-w-2xl max-md:mx-auto max-md:w-full max-md:text-center md:mx-0">
           <motion.h1
             {...enter(18, 0.05, 0.6)}
@@ -169,7 +169,10 @@ export function Hero() {
           </motion.div>
         </div>
 
-        <motion.div {...enter(20, 0.22, 0.65)} className="w-full max-w-lg max-md:mx-auto">
+        <motion.div
+          {...enter(20, 0.22, 0.65)}
+          className="w-full min-w-0 max-w-lg max-md:mx-auto"
+        >
           <Terminal
             className="max-h-none max-w-none bg-base-100"
             sequence={!reduce}

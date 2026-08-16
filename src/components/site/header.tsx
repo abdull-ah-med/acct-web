@@ -4,14 +4,16 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion, useScroll } from "motion/react";
 import { useLenis } from "lenis/react";
+import { usePathname } from "next/navigation";
 import { Ellipsis, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HomeBrandLink } from "@/components/home-brand-link";
 
 const links = [
-  { href: "/#demo", id: "demo", label: "how it works" },
-  { href: "/#planes", id: "planes", label: "what it does" },
   { href: "/#install", id: "install", label: "install" },
+  { href: "/#demo", id: "demo", label: "how it works" },
+  { href: "/#planes", id: "planes", label: "what it controls" },
+  { href: "/docs", id: "docs", label: "docs" },
   { href: "/#releases", id: "releases", label: "releases" },
   { href: "/#faq", id: "faq", label: "faq" },
 ] as const;
@@ -29,9 +31,11 @@ function heroCompactThreshold() {
 }
 
 export function SiteHeader() {
-  const [compact, setCompact] = useState(false);
+  const pathname = usePathname();
+  const onHome = pathname === "/";
+  const [compact, setCompact] = useState(!onHome);
   const [moreOpen, setMoreOpen] = useState(false);
-  const [active, setActive] = useState<string>("");
+  const [active, setActive] = useState<string>(pathname === "/docs" ? "docs" : "");
   const ratiosRef = useRef<Map<string, number>>(new Map());
   const menuRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
@@ -51,6 +55,11 @@ export function SiteHeader() {
   const compactThresholdRef = useRef(0);
 
   useEffect(() => {
+    if (!onHome) {
+      setCompact(true);
+      setActive(pathname === "/docs" ? "docs" : "");
+      return;
+    }
     const refreshThreshold = () => {
       compactThresholdRef.current = heroCompactThreshold();
       setCompact(window.scrollY >= compactThresholdRef.current);
@@ -58,9 +67,10 @@ export function SiteHeader() {
     refreshThreshold();
     window.addEventListener("resize", refreshThreshold);
     return () => window.removeEventListener("resize", refreshThreshold);
-  }, []);
+  }, [onHome, pathname]);
 
   useLenis((lenis) => {
+    if (!onHome) return;
     const next = lenis.scroll >= compactThresholdRef.current;
     setCompact((prev) => (prev === next ? prev : next));
   });
@@ -94,6 +104,11 @@ export function SiteHeader() {
   }, [moreOpen]);
 
   useEffect(() => {
+    if (!onHome) {
+      setActive(pathname === "/docs" ? "docs" : "");
+      return;
+    }
+
     const sectionIds = links.map((l) => l.id);
     const elements = sectionIds
       .map((id) => document.getElementById(id))
@@ -162,7 +177,7 @@ export function SiteHeader() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, []);
+  }, [onHome, pathname]);
 
   const navClass = (id: string) =>
     cn(

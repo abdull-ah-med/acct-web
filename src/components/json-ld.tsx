@@ -77,7 +77,7 @@ export function JsonLd() {
             name: "How do I install acct?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "Run `npm install -g acct-sh`, then `acct init` with --id, --user, --email, --name, --bind, and optionally --import-gh. Add a shell hook with eval \"$(acct hook zsh)\".",
+              text: "Run `npm install -g acct-sh`, then `acct` for the command list. Create a profile with `acct init` (--id, --user, --email, --name, --bind). Add a shell hook with eval \"$(acct hook zsh)\".",
             },
           },
           {

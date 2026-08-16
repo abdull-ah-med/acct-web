@@ -99,7 +99,10 @@ export const AnimatedSpan = ({
       initial={{ opacity: 0, y: -5 }}
       animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: -5 }}
       transition={{ duration: 0.3, delay: sequence ? 0 : delay / 1000 }}
-      className={cn("grid text-sm font-normal tracking-tight", className)}
+      className={cn(
+        "grid min-w-0 max-w-full text-sm font-normal tracking-tight wrap-anywhere",
+        className
+      )}
       onAnimationComplete={() => {
         if (!sequence) return
         if (itemIndex === null) return
@@ -220,13 +223,18 @@ export const TypingAnimation = ({
   return (
     <MotionComponent
       ref={elementRef}
-      className={cn("relative block text-sm font-normal tracking-tight", className)}
+      className={cn(
+        "relative block min-w-0 max-w-full text-sm font-normal tracking-tight wrap-anywhere",
+        className
+      )}
       {...props}
     >
-      <span className="invisible whitespace-pre-wrap" aria-hidden>
+      <span className="invisible whitespace-pre-wrap wrap-anywhere" aria-hidden>
         {children}
       </span>
-      <span className="absolute inset-0 whitespace-pre-wrap">{displayedText}</span>
+      <span className="absolute inset-0 whitespace-pre-wrap wrap-anywhere">
+        {displayedText}
+      </span>
     </MotionComponent>
   )
 }
@@ -278,7 +286,7 @@ export const Terminal = ({
     <div
       ref={containerRef}
       className={cn(
-        "border-border bg-background z-0 h-full max-h-100 w-full max-w-lg overflow-hidden rounded-3xl border",
+        "border-border bg-background z-0 h-full max-h-100 w-full min-w-0 max-w-lg overflow-hidden rounded-3xl border",
         className
       )}
     >
@@ -289,8 +297,8 @@ export const Terminal = ({
           <div className="h-2 w-2 rounded-full bg-green-500"></div>
         </div>
       </div>
-      <pre className="p-4">
-        <code className="grid gap-y-1 overflow-auto">{wrappedChildren}</code>
+      <pre className="min-w-0 overflow-x-hidden p-4 whitespace-pre-wrap wrap-anywhere">
+        <code className="grid min-w-0 gap-y-1 wrap-anywhere">{wrappedChildren}</code>
       </pre>
     </div>
   )

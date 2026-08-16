@@ -167,7 +167,7 @@ export function DirectoryWalk() {
   );
 
   return (
-    <section id="demo" className="relative scroll-mt-24 px-4 py-20 sm:px-6 md:py-28">
+    <section id="demo" className="relative scroll-mt-24 overflow-x-clip px-4 py-20 sm:px-6 md:py-28">
       <div className="mx-auto max-w-7xl">
         <FadeContent blur>
           <div className="mb-10 flex flex-col gap-4 md:mb-14 md:flex-row md:items-end md:justify-between">
@@ -214,7 +214,7 @@ export function DirectoryWalk() {
           </div>
         </FadeContent>
 
-        <div className="grid gap-4 lg:grid-cols-[1fr_1.15fr]">
+        <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
           <FadeContent delay={120} className="h-full">
             <div className="h-full rounded-lg border border-base-content/15 bg-base-100 p-4 sm:p-5">
               <p className="mb-4 font-mono text-xs text-base-content/45">filesystem</p>
@@ -270,8 +270,8 @@ export function DirectoryWalk() {
             </div>
           </FadeContent>
 
-          <FadeContent delay={220} className="h-full">
-            <div className="relative h-full overflow-hidden rounded-lg border border-base-content/15 bg-base-100 p-5 sm:p-6">
+          <FadeContent delay={220} className="h-full min-w-0">
+            <div className="relative h-full min-w-0 overflow-hidden rounded-lg border border-base-content/15 bg-base-100 p-5 sm:p-6">
               {/* Stack every scene in one grid cell so height stays at the tallest
                   state (Downloads) and scene changes never push page content. */}
               <div className="grid">

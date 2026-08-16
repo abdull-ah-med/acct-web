@@ -47,8 +47,8 @@ export default function FAQs() {
   return (
     <section id="faq" className="scroll-mt-24 px-4 py-20 sm:px-6 md:py-28">
       <div className="mx-auto max-w-7xl">
-        <FadeContent>
-          <div className="grid gap-12 md:grid-cols-2 md:gap-10">
+        <div className="grid gap-12 md:grid-cols-2 md:gap-10">
+          <FadeContent>
             <div>
               <p className="mb-3 font-mono text-xs tracking-[0.18em] text-base-content/45 uppercase">
                 FAQ
@@ -57,7 +57,9 @@ export default function FAQs() {
                 Common questions, plain answers.
               </h2>
             </div>
+          </FadeContent>
 
+          <FadeContent delay={70}>
             <div>
               <Accordion className="w-full">
                 {faqItems.map((item) => (
@@ -79,7 +81,14 @@ export default function FAQs() {
               </Accordion>
 
               <p className="mt-6 text-sm text-base-content/50">
-                Want the deep rules? Read the{" "}
+                Every flag is on the{" "}
+                <Link
+                  href="/docs"
+                  className="text-base-content font-medium underline-offset-4 hover:underline"
+                >
+                  command reference
+                </Link>
+                . Deep rules:{" "}
                 <Link
                   href="https://github.com/abdull-ah-med/acct/blob/main/docs/invariants.md"
                   className="text-base-content font-medium underline-offset-4 hover:underline"
@@ -100,8 +109,8 @@ export default function FAQs() {
                 .
               </p>
             </div>
-          </div>
-        </FadeContent>
+          </FadeContent>
+        </div>
       </div>
     </section>
   );

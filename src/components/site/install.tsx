@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Check, Copy } from "lucide-react";
 import FadeContent from "@/components/FadeContent";
 import {
@@ -18,7 +19,8 @@ const blocks = [
     key: "install" as const,
     step: "01",
     title: "Install",
-    snippet: INSTALL_COMMAND,
+    snippet: `${INSTALL_COMMAND}
+acct`,
   },
   {
     key: "init" as const,
@@ -29,8 +31,7 @@ const blocks = [
   --user your-work-user \\
   --email you@company.com \\
   --name "Your Name" \\
-  --bind ~/Work \\
-  --import-gh`,
+  --bind ~/Work`,
   },
   {
     key: "hook" as const,
@@ -42,6 +43,13 @@ acct status
 acct whoami`,
   },
 ];
+
+function promptLines(snippet: string): string {
+  return snippet
+    .split("\n")
+    .map((line) => (line.startsWith("  ") ? line : `$ ${line}`))
+    .join("\n");
+}
 
 export function Install() {
   const [copied, setCopied] = useState<string | null>(null);
@@ -66,11 +74,18 @@ export function Install() {
           </h2>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-base-content/55">
             Install the CLI, bind a folder to a profile, then add the shell hook so every new
-            terminal picks up the right account from your current directory.
+            terminal picks up the right account from your current directory.{" "}
+            <Link
+              href="/docs"
+              className="text-base-content/80 underline decoration-base-content/25 underline-offset-4 hover:decoration-base-content/60"
+            >
+              Full command reference
+            </Link>
+            .
           </p>
         </FadeContent>
 
-        <div className="grid gap-4 lg:grid-cols-3">
+        <div className="grid min-w-0 gap-4 lg:grid-cols-3">
           {blocks.map((block, i) => (
             <FadeContent key={block.key} delay={i * 60}>
               <div className="relative h-full">
@@ -97,7 +112,7 @@ export function Install() {
                     {block.step} · {block.title}
                   </AnimatedSpan>
                   <TypingAnimation duration={22}>
-                    {`$ ${block.snippet}`}
+                    {promptLines(block.snippet)}
                   </TypingAnimation>
                 </Terminal>
               </div>

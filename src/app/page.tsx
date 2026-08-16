@@ -27,15 +27,15 @@ export default function Home() {
   return (
     <>
       <SiteHeader />
-      <main>
+      <main className="overflow-x-clip">
         <Hero />
-        <DirectoryWalk />
+        <Install />
         <div className="hairline mx-auto max-w-7xl" />
         <Problem />
         <div className="hairline mx-auto max-w-7xl" />
-        <Planes />
+        <DirectoryWalk />
         <div className="hairline mx-auto max-w-7xl" />
-        <Install />
+        <Planes />
         <div className="hairline mx-auto max-w-7xl" />
         <Suspense fallback={<ReleasesFallback />}>
           <Releases />

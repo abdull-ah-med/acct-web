@@ -284,6 +284,47 @@
     transform: scaleX(1);
   }
 
+  .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  .reveal.reveal-deep {
+    transform: translateY(18px);
+  }
+
+  .reveal[data-ready] {
+    transition:
+      opacity var(--reveal-duration, var(--duration-reveal)) var(--ease-out),
+      transform var(--reveal-duration, var(--duration-reveal)) var(--ease-out);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .reveal[data-visible],
+  .reveal.reveal-deep[data-visible] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (scripting: none) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .stroke-mark {
+    font-family: var(--font-body), "SF Pro Display", "SF Pro Text", -apple-system,
+      BlinkMacSystemFont, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    text-align: center;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: 0.01em oklch(62% 0 0);
+    paint-order: stroke fill;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .cta-btn:active,
     .cta-btn-primary:hover,
@@ -298,6 +339,14 @@
 
     .scene-tab::after {
       transition: none;
+    }
+
+    .reveal,
+    .reveal.reveal-deep,
+    .reveal[data-visible] {
+      opacity: 1;
+      transform: none;
+      transition: opacity 200ms ease;
     }
   }
 }

@@ -37,6 +37,7 @@ export const siteConfig = {
   npm: "https://www.npmjs.com/package/acct-sh",
   githubPackages: "https://github.com/abdull-ah-med/acct/pkgs/npm/acct-sh",
   docs: {
+    commands: "/docs",
     threatModel:
       "https://github.com/abdull-ah-med/acct/blob/main/docs/threat-model.md",
     invariants:

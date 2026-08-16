@@ -1,11 +1,16 @@
 "use client";
 
-import * as React from "react";
-import { useRef, useEffect } from "react";
-import { gsap } from "gsap";
+import {
+  useEffect,
+  useRef,
+  type CSSProperties,
+  type HTMLAttributes,
+  type ReactNode,
+} from "react";
+import { cn } from "@/lib/utils";
 
-interface FadeContentProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
+interface FadeContentProps extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
   container?: Element | string | null;
   blur?: boolean;
   duration?: number;
@@ -20,23 +25,25 @@ interface FadeContentProps extends React.HTMLAttributes<HTMLDivElement> {
   onDisappearanceComplete?: () => void;
 }
 
-/** Marketing scroll reveal: opacity + translateY (and optional blur). Once. */
-const FadeContent: React.FC<FadeContentProps> = ({
+/** Marketing scroll reveal: opacity + translateY. Fires once, when in view. */
+const FadeContent = ({
   children,
   blur = false,
   duration = 480,
-  ease = "power2.out",
   delay = 0,
   threshold = 0.12,
-  initialOpacity = 0,
-  disappearAfter = 0,
-  disappearDuration = 0.5,
-  disappearEase = "power2.out",
-  onComplete,
-  onDisappearanceComplete,
   className = "",
+  style,
+  container: _container,
+  ease: _ease,
+  initialOpacity: _initialOpacity,
+  disappearAfter: _disappearAfter,
+  disappearDuration: _disappearDuration,
+  disappearEase: _disappearEase,
+  onComplete: _onComplete,
+  onDisappearanceComplete: _onDisappearanceComplete,
   ...props
-}) => {
+}: FadeContentProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,88 +52,40 @@ const FadeContent: React.FC<FadeContentProps> = ({
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) {
-      el.style.opacity = "1";
-      el.style.filter = "none";
-      el.style.transform = "none";
-      el.style.visibility = "visible";
+      el.dataset.visible = "true";
       return;
     }
 
-    const getSeconds = (val: number) => (val > 10 ? val / 1000 : val);
-    let played = false;
-
-    // Skip CSS filter blur — animating `filter` forces expensive layer paints.
-    // Keep a slightly longer fade when callers pass blur for similar weight.
-    const play = () => {
-      if (played) return;
-      played = true;
-      gsap.fromTo(
-        el,
-        {
-          autoAlpha: initialOpacity,
-          y: blur ? 16 : 12,
-        },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: getSeconds(duration) + (blur ? 0.08 : 0),
-          delay: getSeconds(delay),
-          ease,
-          onComplete: () => {
-            onComplete?.();
-            if (disappearAfter > 0) {
-              gsap.to(el, {
-                autoAlpha: initialOpacity,
-                y: -6,
-                delay: getSeconds(disappearAfter),
-                duration: getSeconds(disappearDuration),
-                ease: disappearEase,
-                onComplete: () => onDisappearanceComplete?.(),
-              });
-            }
-          },
-        },
-      );
-    };
+    el.dataset.ready = "true";
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          play();
-          observer.disconnect();
-        }
+        if (!entry.isIntersecting) return;
+        el.dataset.visible = "true";
+        observer.disconnect();
       },
-      { threshold, rootMargin: "0px 0px -8% 0px" }
+      { threshold, rootMargin: "0px 0px -8% 0px" },
     );
 
-    observer.observe(el);
-
-    const fallback = window.setTimeout(play, 1200 + delay);
+    const frame = window.requestAnimationFrame(() => observer.observe(el));
 
     return () => {
+      window.cancelAnimationFrame(frame);
       observer.disconnect();
-      window.clearTimeout(fallback);
-      gsap.killTweensOf(el);
     };
-  }, [
-    blur,
-    delay,
-    disappearAfter,
-    disappearDuration,
-    disappearEase,
-    duration,
-    ease,
-    initialOpacity,
-    onComplete,
-    onDisappearanceComplete,
-    threshold,
-  ]);
+  }, [threshold]);
 
   return (
     <div
       ref={ref}
-      className={className}
-      style={{ opacity: 0, visibility: "hidden" }}
+      className={cn("reveal", blur && "reveal-deep", className)}
+      style={
+        {
+          "--reveal-duration": `${duration}ms`,
+          "--reveal-delay": `${delay}ms`,
+          ...style,
+        } as CSSProperties
+      }
       {...props}
     >
       {children}

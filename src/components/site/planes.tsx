@@ -44,16 +44,20 @@ export function Planes() {
     <section id="planes" className="scroll-mt-24 px-4 py-20 sm:px-6 md:py-28">
       <div className="mx-auto max-w-7xl">
         <div className="mb-10 max-w-2xl md:mb-14">
-          <p className="mb-3 font-mono text-xs tracking-[0.18em] text-base-content/45 uppercase">
-            What acct controls
-          </p>
+          <FadeContent>
+            <p className="mb-3 font-mono text-xs tracking-[0.18em] text-base-content/45 uppercase">
+              What acct controls
+            </p>
+          </FadeContent>
           <ScrollReveal>
             Everything that can leak a GitHub identity across folders.
           </ScrollReveal>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-base-content/55">
-            One tool keeps commit author, push credentials, SSH key, and gh aligned to the
-            directory you are in.
-          </p>
+          <FadeContent delay={50}>
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-base-content/55">
+              One tool keeps commit author, push credentials, SSH key, and gh aligned to the
+              directory you are in.
+            </p>
+          </FadeContent>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
