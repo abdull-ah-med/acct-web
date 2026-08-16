@@ -3,6 +3,7 @@ import Footer from "@/components/footer-1";
 import { SiteHeader } from "@/components/site/header";
 import { DocsView } from "@/components/docs/docs-view";
 import { siteConfig } from "@/lib/site";
+import { jsonLdText } from "@/lib/json-ld";
 
 export const metadata: Metadata = {
   title: "Command reference",
@@ -68,7 +69,7 @@ export default function DocsPage() {
       <SiteHeader />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdText(articleLd) }}
       />
       <main className="overflow-x-clip px-4 pt-28 pb-20 sm:px-6 md:pt-32 md:pb-28">
         <DocsView />

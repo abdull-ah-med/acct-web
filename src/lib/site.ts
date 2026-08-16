@@ -51,8 +51,8 @@ export const siteConfig = {
   locale: "en_US",
   ogImage: {
     url: "/og.jpeg",
-    width: 2720,
-    height: 972,
+    width: 2764,
+    height: 1022,
     alt: "acct — switch GitHub accounts by folder",
   },
 } as const;

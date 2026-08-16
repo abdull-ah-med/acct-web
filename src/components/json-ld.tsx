@@ -1,4 +1,5 @@
 import { siteConfig } from "@/lib/site";
+import { jsonLdText } from "@/lib/json-ld";
 
 /** Structured data for search engines and answer engines. */
 export function JsonLd() {
@@ -112,7 +113,7 @@ export function JsonLd() {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }}
+      dangerouslySetInnerHTML={{ __html: jsonLdText(graph) }}
     />
   );
 }
