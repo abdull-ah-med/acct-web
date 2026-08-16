@@ -6,8 +6,7 @@ import {
   useRef,
   useMemo,
   useLayoutEffect,
-  useEffect,
-  useState,
+  useSyncExternalStore,
 } from "react";
 
 const hexToNormalizedRGB = (hex) => {
@@ -105,6 +104,25 @@ const SilkPlane = forwardRef(function SilkPlane({ uniforms, fps }, ref) {
 });
 SilkPlane.displayName = "SilkPlane";
 
+function subscribeRenderCaps() {
+  return () => {};
+}
+
+function isLowPowerClient() {
+  const coarse = window.matchMedia("(pointer: coarse)").matches;
+  const saveData = navigator.connection?.saveData === true;
+  const cores = navigator.hardwareConcurrency || 4;
+  return saveData || cores <= 4 || coarse;
+}
+
+function getClientDpr() {
+  return isLowPowerClient() ? 1 : Math.min(1.25, window.devicePixelRatio || 1);
+}
+
+function getClientFps() {
+  return isLowPowerClient() ? 20 : 28;
+}
+
 /**
  * Full-bleed silk shader background.
  * `active` pauses the WebGL loop when the hero is off-screen / tab hidden.
@@ -118,19 +136,8 @@ const Silk = ({
   active = true,
 }) => {
   const meshRef = useRef();
-  const [dpr, setDpr] = useState(1);
-  const [fps, setFps] = useState(28);
-
-  useEffect(() => {
-    const coarse = window.matchMedia("(pointer: coarse)").matches;
-    const saveData = navigator.connection?.saveData === true;
-    const cores = navigator.hardwareConcurrency || 4;
-    const lowPower = saveData || cores <= 4 || coarse;
-
-    // Cap pixel ratio hard — hero fills the viewport; 2x DPR is the main lag source.
-    setDpr(lowPower ? 1 : Math.min(1.25, window.devicePixelRatio || 1));
-    setFps(lowPower ? 20 : 28);
-  }, []);
+  const dpr = useSyncExternalStore(subscribeRenderCaps, getClientDpr, () => 1);
+  const fps = useSyncExternalStore(subscribeRenderCaps, getClientFps, () => 28);
 
   const uniforms = useMemo(
     () => ({
@@ -141,18 +148,8 @@ const Silk = ({
       uRotation: { value: rotation },
       uTime: { value: 0 },
     }),
-    // Mount-time defaults; live props synced below.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [speed, scale, noiseIntensity, color, rotation],
   );
-
-  useEffect(() => {
-    uniforms.uSpeed.value = speed;
-    uniforms.uScale.value = scale;
-    uniforms.uNoiseIntensity.value = noiseIntensity;
-    uniforms.uColor.value = hexToNormalizedRGB(color);
-    uniforms.uRotation.value = rotation;
-  }, [speed, scale, noiseIntensity, color, rotation, uniforms]);
 
   return (
     <Canvas

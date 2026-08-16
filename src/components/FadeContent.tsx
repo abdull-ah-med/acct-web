@@ -11,18 +11,10 @@ import { cn } from "@/lib/utils";
 
 interface FadeContentProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
-  container?: Element | string | null;
   blur?: boolean;
   duration?: number;
-  ease?: string;
   delay?: number;
   threshold?: number;
-  initialOpacity?: number;
-  disappearAfter?: number;
-  disappearDuration?: number;
-  disappearEase?: string;
-  onComplete?: () => void;
-  onDisappearanceComplete?: () => void;
 }
 
 /** Marketing scroll reveal: opacity + translateY. Fires once, when in view. */
@@ -34,14 +26,6 @@ const FadeContent = ({
   threshold = 0.12,
   className = "",
   style,
-  container: _container,
-  ease: _ease,
-  initialOpacity: _initialOpacity,
-  disappearAfter: _disappearAfter,
-  disappearDuration: _disappearDuration,
-  disappearEase: _disappearEase,
-  onComplete: _onComplete,
-  onDisappearanceComplete: _onDisappearanceComplete,
   ...props
 }: FadeContentProps) => {
   const ref = useRef<HTMLDivElement>(null);

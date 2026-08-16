@@ -1,5 +1,5 @@
 "use client";
-import { motion, Transition, Easing } from 'motion/react';
+import { motion, Transition, Easing, useReducedMotion } from 'motion/react';
 import { useEffect, useRef, useState, useMemo } from 'react';
 
 type BlurTextProps = {
@@ -45,42 +45,32 @@ const BlurText: React.FC<BlurTextProps> = ({
   stepDuration = 0.35
 }) => {
   const elements = animateBy === 'words' ? text.split(' ') : text.split('');
+  const reduceMotion = useReducedMotion();
   const [inView, setInView] = useState(false);
   const ref = useRef<HTMLParagraphElement>(null);
+  const shown = Boolean(reduceMotion) || inView;
 
   useEffect(() => {
-    if (!ref.current) return;
+    if (!ref.current || reduceMotion) return;
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) {
-      setInView(true);
-      return;
-    }
-
+    const el = ref.current;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setInView(true);
-          observer.unobserve(ref.current as Element);
+          observer.unobserve(el);
         }
       },
       { threshold, rootMargin }
     );
-    observer.observe(ref.current);
-
-    // Already visible on mount
-    const rect = ref.current.getBoundingClientRect();
-    if (rect.top < window.innerHeight && rect.bottom > 0) {
-      setInView(true);
-      observer.disconnect();
-    }
+    observer.observe(el);
 
     const fallback = window.setTimeout(() => setInView(true), 900);
     return () => {
       observer.disconnect();
       window.clearTimeout(fallback);
     };
-  }, [threshold, rootMargin]);
+  }, [threshold, rootMargin, reduceMotion]);
 
   const defaultFrom = useMemo(
     () =>
@@ -123,7 +113,7 @@ const BlurText: React.FC<BlurTextProps> = ({
           <motion.span
             key={index}
             initial={fromSnapshot}
-            animate={inView ? animateKeyframes : fromSnapshot}
+            animate={shown ? animateKeyframes : fromSnapshot}
             transition={spanTransition}
             onAnimationComplete={index === elements.length - 1 ? onAnimationComplete : undefined}
             style={{

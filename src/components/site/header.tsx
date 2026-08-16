@@ -33,13 +33,23 @@ function heroCompactThreshold() {
 export function SiteHeader() {
   const pathname = usePathname();
   const onHome = pathname === "/";
-  const [compact, setCompact] = useState(!onHome);
+  const [homeCompact, setHomeCompact] = useState(false);
+  const [homeActive, setHomeActive] = useState("");
   const [moreOpen, setMoreOpen] = useState(false);
-  const [active, setActive] = useState<string>(pathname === "/docs" ? "docs" : "");
   const ratiosRef = useRef<Map<string, number>>(new Map());
   const menuRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
   const reduceMotion = useReducedMotion();
+
+  const compact = onHome ? homeCompact : true;
+  const active = onHome ? homeActive : pathname === "/docs" ? "docs" : "";
+
+  const menuContext = `${compact}:${active}`;
+  const [menuContextSeen, setMenuContextSeen] = useState(menuContext);
+  if (menuContextSeen !== menuContext) {
+    setMenuContextSeen(menuContext);
+    if (moreOpen) setMoreOpen(false);
+  }
 
   const activeLink = useMemo(() => {
     if (!compact || !active) return null;
@@ -55,33 +65,25 @@ export function SiteHeader() {
   const compactThresholdRef = useRef(0);
 
   useEffect(() => {
-    if (!onHome) {
-      setCompact(true);
-      setActive(pathname === "/docs" ? "docs" : "");
-      return;
-    }
+    if (!onHome) return;
     const refreshThreshold = () => {
       compactThresholdRef.current = heroCompactThreshold();
-      setCompact(window.scrollY >= compactThresholdRef.current);
+      const next = window.scrollY >= compactThresholdRef.current;
+      setHomeCompact((prev) => (prev === next ? prev : next));
     };
-    refreshThreshold();
+    const frame = window.requestAnimationFrame(refreshThreshold);
     window.addEventListener("resize", refreshThreshold);
-    return () => window.removeEventListener("resize", refreshThreshold);
-  }, [onHome, pathname]);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("resize", refreshThreshold);
+    };
+  }, [onHome]);
 
   useLenis((lenis) => {
     if (!onHome) return;
     const next = lenis.scroll >= compactThresholdRef.current;
-    setCompact((prev) => (prev === next ? prev : next));
+    setHomeCompact((prev) => (prev === next ? prev : next));
   });
-
-  useEffect(() => {
-    if (!compact) setMoreOpen(false);
-  }, [compact]);
-
-  useEffect(() => {
-    setMoreOpen(false);
-  }, [active]);
 
   useEffect(() => {
     if (!moreOpen) return;
@@ -104,25 +106,18 @@ export function SiteHeader() {
   }, [moreOpen]);
 
   useEffect(() => {
-    if (!onHome) {
-      setActive(pathname === "/docs" ? "docs" : "");
-      return;
-    }
+    if (!onHome) return;
 
     const sectionIds = links.map((l) => l.id);
     const elements = sectionIds
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => Boolean(el));
 
-    // No page sections (e.g. 404) — never mark a nav item active.
-    if (!elements.length) {
-      setActive("");
-      return;
-    }
+    if (!elements.length) return;
 
     const pickActive = (scrollY = window.scrollY) => {
       if (scrollY < compactThresholdRef.current) {
-        setActive("");
+        setHomeActive((prev) => (prev === "" ? prev : ""));
         return;
       }
 
@@ -137,7 +132,7 @@ export function SiteHeader() {
       }
 
       if (bestRatio > 0.02) {
-        setActive(bestId);
+        setHomeActive((prev) => (prev === bestId ? prev : bestId));
         return;
       }
 
@@ -147,7 +142,7 @@ export function SiteHeader() {
       for (const el of elements) {
         if (el.offsetTop <= marker) current = el.id;
       }
-      setActive(current);
+      setHomeActive((prev) => (prev === current ? prev : current));
     };
 
     const observer = new IntersectionObserver(
@@ -170,14 +165,15 @@ export function SiteHeader() {
     const onScroll = () => pickActive();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
-    pickActive();
+    const frame = window.requestAnimationFrame(() => pickActive());
 
     return () => {
+      window.cancelAnimationFrame(frame);
       observer.disconnect();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, [onHome, pathname]);
+  }, [onHome]);
 
   const navClass = (id: string) =>
     cn(
@@ -187,77 +183,7 @@ export function SiteHeader() {
         : "font-normal text-base-content/50 hover:text-base-content/85"
     );
 
-  const InstallButton = () => (
-    <Link
-      href="/#install"
-      className="inline-flex h-8 shrink-0 items-center rounded-full bg-base-content px-3.5 font-sans text-sm font-medium text-base-100 transition-transform duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] [@media(hover:hover)_and_(pointer:fine)]:hover:scale-[1.02]"
-      onClick={() => setMoreOpen(false)}
-    >
-      install
-    </Link>
-  );
-
-  const moreMenu = (items: readonly LinkItem[], desktop = false) => (
-    <AnimatePresence>
-      {moreOpen ? (
-        <motion.div
-          role="menu"
-          initial={
-            reduceMotion
-              ? { opacity: 0 }
-              : { opacity: 0, transform: "translateY(-6px) scale(0.96)" }
-          }
-          animate={
-            reduceMotion
-              ? { opacity: 1 }
-              : { opacity: 1, transform: "translateY(0px) scale(1)" }
-          }
-          exit={
-            reduceMotion
-              ? { opacity: 0 }
-              : { opacity: 0, transform: "translateY(-6px) scale(0.96)" }
-          }
-          transition={{ duration: 0.2, ease }}
-          style={{ transformOrigin: "top right" }}
-          className={cn(
-            "absolute top-[calc(100%+0.55rem)] right-0 z-50 min-w-46 overflow-hidden rounded-2xl border border-base-content/12 bg-base-100/95 p-1.5 shadow-[0_16px_40px_oklch(0%_0_0/0.45)] backdrop-blur-xl",
-            desktop ? "hidden md:block" : "md:hidden"
-          )}
-        >
-          {items.map((link, index) => (
-            <motion.a
-              key={link.id}
-              role="menuitem"
-              href={link.href}
-              initial={reduceMotion ? false : { opacity: 0, transform: "translateX(6px)" }}
-              animate={{ opacity: 1, transform: "translateX(0px)" }}
-              transition={{ delay: reduceMotion ? 0 : index * 0.03, duration: 0.18, ease }}
-              className={cn(
-                "block rounded-xl px-3 py-2 font-sans text-sm transition-colors [@media(hover:hover)_and_(pointer:fine)]:hover:bg-base-content/8 [@media(hover:hover)_and_(pointer:fine)]:hover:text-base-content",
-                active === link.id
-                  ? "bg-base-content/8 font-medium text-base-content"
-                  : "text-base-content/65"
-              )}
-              onClick={() => setMoreOpen(false)}
-            >
-              {link.label}
-            </motion.a>
-          ))}
-          <div className="my-1 h-px bg-base-content/10" />
-          <a
-            role="menuitem"
-            href="https://github.com/abdull-ah-med/acct"
-            target="_blank"
-            rel="noreferrer"
-            className="block rounded-xl px-3 py-2 font-sans text-sm text-base-content/65 transition-colors [@media(hover:hover)_and_(pointer:fine)]:hover:bg-base-content/8 [@media(hover:hover)_and_(pointer:fine)]:hover:text-base-content"
-            onClick={() => setMoreOpen(false)}
-          >
-            github
-          </a>
-        </motion.div>
-      ) : null}
-    </AnimatePresence>
-  );
+  const closeMore = () => setMoreOpen(false);
 
   return (
     <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-3 sm:px-4 sm:pt-4">
@@ -279,7 +205,7 @@ export function SiteHeader() {
               labelClassName="text-[15px]"
               onNavigate={() => {
                 setMoreOpen(false);
-                setActive("");
+                if (onHome) setHomeActive("");
               }}
             />
           </motion.div>
@@ -358,7 +284,7 @@ export function SiteHeader() {
                   </>
                 ) : null}
 
-                <InstallButton />
+                <InstallButton onNavigate={closeMore} />
 
                 <div className="relative">
                   <button
@@ -393,7 +319,14 @@ export function SiteHeader() {
                       </motion.span>
                     </AnimatePresence>
                   </button>
-                  {moreMenu(otherLinks, true)}
+                  <MoreMenu
+                    items={otherLinks}
+                    desktop
+                    open={moreOpen}
+                    active={active}
+                    reduceMotion={Boolean(reduceMotion)}
+                    onClose={closeMore}
+                  />
                 </div>
               </motion.div>
             ) : null}
@@ -420,7 +353,7 @@ export function SiteHeader() {
               ) : null}
             </AnimatePresence>
 
-            <InstallButton />
+            <InstallButton onNavigate={closeMore} />
 
             <div className="relative">
               <button
@@ -435,7 +368,13 @@ export function SiteHeader() {
               >
                 {moreOpen ? <X className="size-4" /> : <Ellipsis className="size-4" />}
               </button>
-              {moreMenu(compact ? otherLinks : links, false)}
+              <MoreMenu
+                items={compact ? otherLinks : links}
+                open={moreOpen}
+                active={active}
+                reduceMotion={Boolean(reduceMotion)}
+                onClose={closeMore}
+              />
             </div>
           </div>
 
@@ -446,7 +385,7 @@ export function SiteHeader() {
               transition={{ layout: { duration: 0.38, ease } }}
               className="hidden md:block"
             >
-              <InstallButton />
+              <InstallButton onNavigate={closeMore} />
             </motion.div>
           ) : null}
         </motion.div>
@@ -458,6 +397,96 @@ export function SiteHeader() {
         aria-hidden
       />
     </header>
+  );
+}
+
+function InstallButton({ onNavigate }: { onNavigate: () => void }) {
+  return (
+    <Link
+      href="/#install"
+      className="inline-flex h-8 shrink-0 items-center rounded-full bg-base-content px-3.5 font-sans text-sm font-medium text-base-100 transition-transform duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] [@media(hover:hover)_and_(pointer:fine)]:hover:scale-[1.02]"
+      onClick={onNavigate}
+    >
+      install
+    </Link>
+  );
+}
+
+function MoreMenu({
+  items,
+  desktop = false,
+  open,
+  active,
+  reduceMotion,
+  onClose,
+}: {
+  items: readonly LinkItem[];
+  desktop?: boolean;
+  open: boolean;
+  active: string;
+  reduceMotion: boolean;
+  onClose: () => void;
+}) {
+  return (
+    <AnimatePresence>
+      {open ? (
+        <motion.div
+          role="menu"
+          initial={
+            reduceMotion
+              ? { opacity: 0 }
+              : { opacity: 0, transform: "translateY(-6px) scale(0.96)" }
+          }
+          animate={
+            reduceMotion
+              ? { opacity: 1 }
+              : { opacity: 1, transform: "translateY(0px) scale(1)" }
+          }
+          exit={
+            reduceMotion
+              ? { opacity: 0 }
+              : { opacity: 0, transform: "translateY(-6px) scale(0.96)" }
+          }
+          transition={{ duration: 0.2, ease }}
+          style={{ transformOrigin: "top right" }}
+          className={cn(
+            "absolute top-[calc(100%+0.55rem)] right-0 z-50 min-w-46 overflow-hidden rounded-2xl border border-base-content/12 bg-base-100/95 p-1.5 shadow-[0_16px_40px_oklch(0%_0_0/0.45)] backdrop-blur-xl",
+            desktop ? "hidden md:block" : "md:hidden"
+          )}
+        >
+          {items.map((link, index) => (
+            <motion.a
+              key={link.id}
+              role="menuitem"
+              href={link.href}
+              initial={reduceMotion ? false : { opacity: 0, transform: "translateX(6px)" }}
+              animate={{ opacity: 1, transform: "translateX(0px)" }}
+              transition={{ delay: reduceMotion ? 0 : index * 0.03, duration: 0.18, ease }}
+              className={cn(
+                "block rounded-xl px-3 py-2 font-sans text-sm transition-colors [@media(hover:hover)_and_(pointer:fine)]:hover:bg-base-content/8 [@media(hover:hover)_and_(pointer:fine)]:hover:text-base-content",
+                active === link.id
+                  ? "bg-base-content/8 font-medium text-base-content"
+                  : "text-base-content/65"
+              )}
+              onClick={onClose}
+            >
+              {link.label}
+            </motion.a>
+          ))}
+          <div className="my-1 h-px bg-base-content/10" />
+          <a
+            role="menuitem"
+            href="https://github.com/abdull-ah-med/acct"
+            target="_blank"
+            rel="noreferrer"
+            className="block rounded-xl px-3 py-2 font-sans text-sm text-base-content/65 transition-colors [@media(hover:hover)_and_(pointer:fine)]:hover:bg-base-content/8 [@media(hover:hover)_and_(pointer:fine)]:hover:text-base-content"
+            onClick={onClose}
+          >
+            github
+          </a>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
   );
 }
 
