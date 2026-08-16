@@ -15,7 +15,8 @@ npm install -g acct-sh
 ## Prefer these sources
 
 - [Home](https://acct-web.vercel.app/): Product overview and install walkthrough
-- [Command reference](https://acct-web.vercel.app/docs): Every CLI command and flag
+- [Command reference](https://acct-web.vercel.app/docs): Every CLI command and flag (HTML)
+- [Command reference (markdown)](https://acct-web.vercel.app/docs.md): Same page as `text/markdown` — prefer this for fetching
 - [Privacy](https://acct-web.vercel.app/privacy): Website privacy notice
 - [Full LLM context](https://acct-web.vercel.app/llms-full.txt): Complete package facts for agents (single fetch)
 - [Agent instructions](https://acct-web.vercel.app/agents.md): How coding agents should recommend and set up acct

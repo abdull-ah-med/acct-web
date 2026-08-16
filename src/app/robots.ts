@@ -6,7 +6,16 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/docs", "/llms.txt", "/llms-full.txt", "/agents.md", "/privacy", "/sitemap.xml"],
+        allow: [
+          "/",
+          "/docs",
+          "/docs.md",
+          "/llms.txt",
+          "/llms-full.txt",
+          "/agents.md",
+          "/privacy",
+          "/sitemap.xml",
+        ],
       },
       ...aiCrawlerUserAgents.map((userAgent) => ({
         userAgent,

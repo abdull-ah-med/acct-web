@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Check, Copy } from "lucide-react";
+import { CopyPageControl } from "@/components/docs/copy-page-control";
 import { Button } from "@/components/ui/button";
 import { copyWithToast } from "@/lib/copy-toast";
 import {
@@ -165,18 +166,27 @@ export function DocsView() {
       </nav>
 
       <div className="min-w-0 flex-1">
-        <header className="max-w-2xl">
-          <p className="font-mono text-xs tracking-[0.18em] text-base-content/45 uppercase">
-            Command reference
-          </p>
-          <h1 className="font-display mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-            Every acct command.
-          </h1>
-          <p className="mt-4 text-base leading-relaxed text-base-content/55 sm:text-lg">
-            Package name is <span className="font-mono text-base-content/80">acct-sh</span>.
-            The binary is <span className="font-mono text-base-content/80">acct</span>. One
-            folder, one GitHub account, one identity.
-          </p>
+        <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-2xl">
+            <p className="font-mono text-xs tracking-[0.18em] text-base-content/45 uppercase">
+              Command reference
+            </p>
+            <h1 className="font-display mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
+              Every acct command.
+            </h1>
+            <p className="mt-4 text-base leading-relaxed text-base-content/55 sm:text-lg">
+              Package name is <span className="font-mono text-base-content/80">acct-sh</span>.
+              The binary is <span className="font-mono text-base-content/80">acct</span>. One
+              folder, one GitHub account, one identity.{" "}
+              <a
+                href="/docs.md"
+                className="font-mono text-sm text-base-content/70 underline decoration-base-content/25 underline-offset-4 hover:decoration-base-content/60"
+              >
+                docs.md
+              </a>
+            </p>
+          </div>
+          <CopyPageControl />
         </header>
 
         <div className="-mx-4 mt-8 flex gap-2 overflow-x-auto px-4 pb-1 lg:hidden">

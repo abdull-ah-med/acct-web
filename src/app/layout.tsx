@@ -46,7 +46,10 @@ export const metadata: Metadata = {
         { url: "/llms.txt", title: "LLM index" },
         { url: "/llms-full.txt", title: "LLM full context" },
       ],
-      "text/markdown": [{ url: "/agents.md", title: "Agent instructions" }],
+      "text/markdown": [
+        { url: "/docs.md", title: "Command reference (markdown)" },
+        { url: "/agents.md", title: "Agent instructions" },
+      ],
     },
   },
   icons: {

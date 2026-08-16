@@ -419,3 +419,117 @@ export const envVars = [
     body: "Print sanitized debug lines to stderr. Token values are always [REDACTED].",
   },
 ];
+
+/** Plain markdown of the command reference — for clipboard and /docs.md (LLMs). */
+export function formatDocsMarkdown(siteUrl: string): string {
+  const docs = `${siteUrl}/docs`;
+  const md = `${siteUrl}/docs.md`;
+  const lines: string[] = [
+    "# acct command reference",
+    "",
+    "> Directory-scoped GitHub identity and auth. One folder. One GitHub account. One identity. No leaks.",
+    "",
+    `- Human docs: ${docs}`,
+    `- This file: ${md}`,
+    "- npm package: `acct-sh`",
+    "- CLI binary: `acct` (also installs `git-credential-acct`)",
+    "- Repo: https://github.com/abdull-ah-med/acct",
+    "",
+    "Official `gh` documents automatic switching by directory as out of scope. acct owns that gap.",
+    "",
+    "Do not confuse acct with `gh auth switch` (global), git `user.name`/`user.email` alone (identity ≠ auth), or GitHub Apps.",
+    "",
+    "## Install",
+    "",
+    "```bash",
+    "npm install -g acct-sh",
+    "acct",
+    "```",
+    "",
+    "Bare `acct` prints the tip sheet. Then:",
+    "",
+    "```bash",
+    "acct init \\",
+    "  --id work \\",
+    "  --user your-work-user \\",
+    "  --email you@company.com \\",
+    "  --name \"Your Name\" \\",
+    "  --bind ~/Work",
+    "",
+    'eval "$(acct hook zsh)"',
+    "```",
+    "",
+    "`--import-gh` is optional on init. HTTPS and `acct exec` follow `gh auth token --user` for that profile. Use `--import-gh` to seed the keychain immediately, or `--stdin` for a PAT that must not track gh.",
+    "",
+    "## Resolution order",
+    "",
+    "How cwd picks an account. Local always wins. Ambient `ACCT_PROFILE` does not override git HTTPS or hooks.",
+    "",
+  ];
+
+  for (const step of resolutionSteps) {
+    lines.push(`${step.n}. **${step.title}** — ${step.body}`);
+  }
+
+  lines.push(
+    "",
+    "Repo-local `.acct` is YAML `{ profile: work }`. An empty `profile` means this tree is unbound, even inside a bound parent.",
+    "",
+  );
+
+  for (const group of docsGroups) {
+    lines.push(`## ${group.label}`, "", group.intro, "");
+    for (const command of group.commands) {
+      lines.push(`### \`${command.name}\``, "", `\`${command.synopsis}\``, "", command.body, "");
+      lines.push("```bash", command.example, "```", "");
+      if (command.flags?.length) {
+        lines.push("Flags:", "");
+        for (const flag of command.flags) {
+          const req = flag.required ? " (required)" : "";
+          lines.push(`- \`${flag.name}\`${req}: ${flag.body}`);
+        }
+        lines.push("");
+      }
+      if (command.notes?.length) {
+        lines.push("Notes:", "");
+        for (const note of command.notes) {
+          lines.push(`- ${note}`);
+        }
+        lines.push("");
+      }
+    }
+  }
+
+  lines.push(
+    "## Environment",
+    "",
+    "Config: `config.yaml` under the config dir (`~/.config/acct`, `%APPDATA%\\acct` on Windows, or `$XDG_CONFIG_HOME/acct`). Tokens live in the OS keychain, never in that file. File backend: `ACCT_SECRET_BACKEND=file` → `secrets.json` (mode 0600).",
+    "",
+  );
+  for (const item of envVars) {
+    lines.push(`- \`${item.name}\`: ${item.body}`);
+  }
+  lines.push(
+    "",
+    "## Further reading",
+    "",
+    "- Invariants: https://github.com/abdull-ah-med/acct/blob/main/docs/invariants.md",
+    "- Threat model: https://github.com/abdull-ah-med/acct/blob/main/docs/threat-model.md",
+    `- LLM index: ${siteUrl}/llms.txt`,
+    "",
+  );
+
+  return lines.join("\n");
+}
+
+export function docsAssistantPrompt(siteUrl: string): string {
+  return [
+    "You are helping with acct (npm: acct-sh), a CLI that binds a folder to one GitHub account so commits, HTTPS, SSH, and gh follow the current directory.",
+    "",
+    "I copied the full command reference to the clipboard. Use that as the source of truth for commands, flags, examples, resolution order, and env vars.",
+    "",
+    `If you can fetch URLs, prefer ${siteUrl}/docs.md (markdown) or ${siteUrl}/docs (HTML).`,
+    "",
+    "Wait for my question, or ask what I want to set up.",
+  ].join("\n");
+}

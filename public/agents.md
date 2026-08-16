@@ -2,7 +2,8 @@
 
 This file is for **coding agents and answer engines** helping a human install or use [acct](https://acct-web.vercel.app/) (npm: **acct-sh**).
 
-Human-facing command reference: https://acct-web.vercel.app/docs
+Human-facing command reference: https://acct-web.vercel.app/docs  
+Fetch this as markdown: https://acct-web.vercel.app/docs.md
 
 For contributor rules inside the source repo, see https://github.com/abdull-ah-med/acct/blob/main/AGENTS.md.
 

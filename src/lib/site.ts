@@ -38,6 +38,7 @@ export const siteConfig = {
   githubPackages: "https://github.com/abdull-ah-med/acct/pkgs/npm/acct-sh",
   docs: {
     commands: "/docs",
+    markdown: "/docs.md",
     threatModel:
       "https://github.com/abdull-ah-med/acct/blob/main/docs/threat-model.md",
     invariants:

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
@@ -103,7 +103,7 @@ export function DirectoryWalk() {
             title: "Active account",
             description:
               "That profile sets your git name/email and which GitHub user is in play.",
-            side: "left",
+            side: "bottom",
             align: "start",
           },
         },
@@ -131,40 +131,6 @@ export function DirectoryWalk() {
     });
     tour.drive();
   }, []);
-
-  const tree = useMemo(
-    () => [
-      { label: "~", depth: 0, active: false },
-      {
-        label: "Personal/",
-        depth: 1,
-        active: scene.id === "personal",
-        profile: "personal",
-      },
-      {
-        label: "blog/",
-        depth: 2,
-        active: scene.id === "personal",
-      },
-      {
-        label: "Work/",
-        depth: 1,
-        active: scene.id === "work",
-        profile: "work",
-      },
-      {
-        label: "api/",
-        depth: 2,
-        active: scene.id === "work",
-      },
-      {
-        label: "Downloads/",
-        depth: 1,
-        active: scene.id === "downloads",
-      },
-    ],
-    [scene.id]
-  );
 
   return (
     <section id="demo" className="relative scroll-mt-24 overflow-x-clip px-4 py-20 sm:px-6 md:py-28">
@@ -214,39 +180,9 @@ export function DirectoryWalk() {
           </div>
         </FadeContent>
 
-        <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
-          <FadeContent delay={120} className="h-full">
-            <div className="h-full rounded-lg border border-base-content/15 bg-base-100 p-4 sm:p-5">
-              <p className="mb-4 font-mono text-xs text-base-content/45">filesystem</p>
-              <ul className="space-y-1 font-mono text-sm">
-                {tree.map((node) => (
-                  <li
-                    key={`${node.depth}-${node.label}`}
-                    className={cn(
-                      "flex items-center gap-2 px-2 py-1.5 transition-colors duration-200 ease-[var(--ease-out)]",
-                      node.active ? "text-base-content" : "text-base-content/45"
-                    )}
-                    style={{ paddingLeft: `${0.5 + node.depth * 0.85}rem` }}
-                  >
-                    <span
-                      className={cn(
-                        "size-1.5 shrink-0 rounded-full transition-[transform,opacity,background-color] duration-200 ease-[var(--ease-out)]",
-                        node.active
-                          ? "scale-100 bg-base-content opacity-100"
-                          : "scale-90 bg-base-content/25 opacity-70"
-                      )}
-                    />
-                    <span>{node.label}</span>
-                    {"profile" in node && node.profile ? (
-                      <span className="ml-auto font-mono text-[11px] tracking-wide text-base-content/40">
-                        {node.profile}
-                      </span>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-6 flex flex-wrap gap-x-5 gap-y-3 border-t border-base-content/10 pt-4">
+        <FadeContent delay={120} className="min-w-0">
+            <div className="relative min-w-0 overflow-hidden rounded-lg border border-base-content/15 bg-base-100 p-5 sm:p-6">
+              <div className="mb-6 flex flex-wrap gap-x-5 gap-y-3">
                 {scenes.map((s, i) => (
                   <button
                     key={s.id}
@@ -267,11 +203,7 @@ export function DirectoryWalk() {
                   </button>
                 ))}
               </div>
-            </div>
-          </FadeContent>
 
-          <FadeContent delay={220} className="h-full min-w-0">
-            <div className="relative h-full min-w-0 overflow-hidden rounded-lg border border-base-content/15 bg-base-100 p-5 sm:p-6">
               {/* Stack every scene in one grid cell so height stays at the tallest
                   state (Downloads) and scene changes never push page content. */}
               <div className="grid">
@@ -380,7 +312,6 @@ export function DirectoryWalk() {
               </Terminal>
             </div>
           </FadeContent>
-        </div>
       </div>
     </section>
   );
