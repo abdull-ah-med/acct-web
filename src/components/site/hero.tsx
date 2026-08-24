@@ -10,6 +10,7 @@ import {
   Terminal,
   TypingAnimation,
 } from "@/components/ui/terminal";
+import { AgentMarquee } from "@/components/site/agent-marquee";
 
 const Silk = dynamic(() => import("@/components/Silk"), {
   ssr: false,
@@ -116,7 +117,7 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="relative flex min-h-dvh min-w-0 items-center overflow-hidden px-4 sm:px-6"
+      className="relative flex min-h-dvh min-w-0 flex-col overflow-hidden"
     >
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         <HeroBackdrop />
@@ -126,7 +127,7 @@ export function Hero() {
         aria-hidden
       />
 
-      <div className="relative z-10 mx-auto flex w-full min-w-0 max-w-7xl flex-col items-stretch gap-10 py-28 text-left lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:py-24">
+      <div className="relative z-10 mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col items-stretch justify-center gap-10 px-4 pt-28 pb-10 text-left sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:pt-24 lg:pb-6">
         <div className="max-w-2xl max-md:mx-auto max-md:w-full max-md:text-center md:mx-0">
           <motion.h1
             {...enter(18, 0.05, 0.6)}
@@ -203,6 +204,7 @@ export function Hero() {
         </motion.div>
       </div>
 
+      <AgentMarquee />
       <div className="hairline absolute inset-x-0 bottom-0 z-10" />
     </section>
   );

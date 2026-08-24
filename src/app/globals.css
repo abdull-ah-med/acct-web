@@ -396,6 +396,35 @@
   border: 1px solid oklch(94% 0 0 / 12%);
 }
 
+@keyframes agent-marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-25%, 0, 0);
+  }
+}
+
+.agent-marquee-track {
+  animation: agent-marquee 80s linear infinite;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.agent-marquee-track > ul {
+  flex-shrink: 0;
+}
+
+.agent-marquee-fade {
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 7%,
+    #000 93%,
+    transparent
+  );
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -407,5 +436,10 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .agent-marquee-track {
+    animation: none !important;
+    transform: none !important;
   }
 }
