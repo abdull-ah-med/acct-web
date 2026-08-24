@@ -396,6 +396,11 @@
   border: 1px solid oklch(94% 0 0 / 12%);
 }
 
+.agent-marquee-label {
+  font-family: var(--font-body), "SF Pro Display", "SF Pro Text", -apple-system,
+    BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
 @keyframes agent-marquee {
   0% {
     transform: translate3d(0, 0, 0);
@@ -406,9 +411,15 @@
 }
 
 .agent-marquee-track {
-  animation: agent-marquee 80s linear infinite;
+  animation: agent-marquee 45s linear infinite;
   backface-visibility: hidden;
   will-change: transform;
+}
+
+@media (min-width: 640px) {
+  .agent-marquee-track {
+    animation-duration: 80s;
+  }
 }
 
 .agent-marquee-track > ul {

@@ -163,7 +163,7 @@ export function AgentMarquee() {
       role="region"
       aria-label="Works with all of your coding agents"
     >
-      <p className="mb-5 px-4 text-center font-sans text-[0.68rem] font-medium tracking-[0.18em] text-base-content/40 sm:text-xs">
+      <p className="agent-marquee-label mb-5 px-4 text-center text-[0.68rem] font-medium tracking-[0.12em] text-base-content/40 sm:text-xs">
         Works with all of your coding agents
       </p>
       <div className="agent-marquee-fade overflow-hidden">
