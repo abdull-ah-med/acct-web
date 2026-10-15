@@ -8,7 +8,7 @@ Marketing site for [`acct`](https://github.com/abdull-ah-med/acct) - directory-s
 - Tailwind CSS 4 with the existing dark theme and expanding pill navigation
 - Syne display type, IBM Plex Mono utility type and system body type
 - Motion disclosures with reduced-motion support; keyboard-accessible folder preview
-- Server-rendered npm downloads beneath the hero install command and a dedicated release-notes page
+- Server-rendered npm downloads beneath the hero title and a dedicated release-notes page
 
 ## Develop
 

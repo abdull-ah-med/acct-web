@@ -268,6 +268,7 @@ export function Hero({ downloads }: { downloads: ReactNode }) {
       <div className="hero-section page-width">
         <div className="hero-copy">
           <h1>acct</h1>
+          {downloads}
           <h2>Use the right GitHub account in every folder.</h2>
           <p className="hero-description">
             Bind a directory to a GitHub account so your Git identity,
@@ -275,10 +276,7 @@ export function Hero({ downloads }: { downloads: ReactNode }) {
             working in.
           </p>
           <div className="hero-actions">
-            <div className="hero-install">
-              <InstallButton />
-              {downloads}
-            </div>
+            <InstallButton />
             <Link href="/docs" className="hero-docs-link">
               Read the documentation <ArrowUpRight size={16} />
             </Link>

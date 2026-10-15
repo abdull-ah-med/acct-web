@@ -178,12 +178,18 @@ class SiteUI(unittest.TestCase):
         self.assertAlmostEqual(position, 96, delta=3)
         expect(self.page.locator('.pill-context')).to_contain_text('Setup')
 
-    def test_downloads_are_below_the_hero_install_button_without_a_stats_bar(self):
+    def test_downloads_are_under_the_title_on_desktop_and_mobile(self):
         self.home()
-        downloads = self.page.locator('#hero').get_by_role('link', name=re.compile(r'^[\d,]+\+ downloads$'))
-        expect(downloads).to_be_visible()
-        button = self.page.get_by_role('button', name='Copy npm install command').bounding_box()
-        self.assertGreaterEqual(downloads.bounding_box()['y'], button['y'] + button['height'])
+        for width in [1440, 390, 320]:
+            self.page.set_viewport_size({'width':width,'height':1000})
+            downloads = self.page.locator('#hero').get_by_role('link', name=re.compile(r'^[\d,]+\+ downloads$'))
+            expect(downloads).to_be_visible()
+            title = self.page.locator('#hero h1').bounding_box()
+            subtitle = self.page.locator('#hero h2').bounding_box()
+            count = downloads.bounding_box()
+            self.assertGreaterEqual(count['y'], title['y'] + title['height'])
+            self.assertLessEqual(count['y'] + count['height'], subtitle['y'])
+            self.assertAlmostEqual(count['x'], title['x'], delta=1)
         expect(self.page.get_by_role('region', name='Package information')).to_have_count(0)
         expect(self.page.locator('.release-entry')).to_have_count(0)
 
