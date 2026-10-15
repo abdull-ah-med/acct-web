@@ -22,6 +22,7 @@ export default function Footer() {
         </div>
         <nav aria-label="Footer navigation">
           <Link href="/docs">Documentation</Link>
+          <Link href="/releases">Release notes</Link>
           <a
             href="https://github.com/abdull-ah-med/acct"
             target="_blank"

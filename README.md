@@ -7,8 +7,8 @@ Marketing site for [`acct`](https://github.com/abdull-ah-med/acct) - directory-s
 - Next.js 16 App Router, React 19 and TypeScript
 - Tailwind CSS 4 with the existing dark theme and expanding pill navigation
 - Syne display type, IBM Plex Mono utility type and system body type
-- Native expandable release notes and FAQs; keyboard-accessible folder preview
-- Server-rendered npm download statistics and GitHub release data
+- Motion disclosures with reduced-motion support; keyboard-accessible folder preview
+- Server-rendered npm downloads beneath the hero install command and a dedicated release-notes page
 
 ## Develop
 
@@ -52,9 +52,9 @@ npm run build
 
 The data regression tests use Node.js 22.6+ type stripping with the built-in test runner (no extra test dependency). The website runtime remains compatible with Next.js's supported Node versions.
 
-Release notes preserve wrapped lines, all bullets, introductory upgrade notes, and GitHub body fallback. The latest notes are open initially, while older versions are grouped under “Previous Releases”; the server refreshes release data every 30 minutes.
+Release notes preserve wrapped lines, all bullets, introductory upgrade notes, and GitHub body fallback. The /releases page shares the documentation layout with /docs and /privacy. The latest notes are open initially, while older versions are grouped under “Previous Releases”; the server refreshes release data every 30 minutes.
 
-Cumulative downloads come from npm's public point API, starting at the registry's package-creation date and ending on npm's latest complete day. Non-overlapping 365-day queries stay below npm's 18-month limit. Counts refresh hourly; partial/invalid/failed responses display an unavailable state rather than a misleading total. Downloads are not unique users.
+Cumulative downloads come from npm's public point API, starting at the registry's package-creation date and ending on npm's latest complete day. Non-overlapping 365-day queries stay below npm's 18-month limit. Counts refresh hourly; partial, invalid, or failed responses omit the total rather than displaying a misleading number. Downloads are not unique users.
 
 Sources: https://github.com/npm/registry/blob/main/docs/download-counts.md and https://nextjs.org/docs/app/api-reference/functions/fetch.
 

@@ -1,5 +1,7 @@
 import { ArrowUpRight, ChevronDown } from "lucide-react";
 import type { Release } from "@/lib/releases";
+import { Disclosure } from "@/components/disclosure";
+
 function dateLabel(release: Release) {
   const raw =
     release.publishedAt ?? (release.date ? `${release.date}T12:00:00Z` : null);
@@ -16,23 +18,34 @@ function dateLabel(release: Release) {
 }
 function ReleaseEntry({
   release,
-  open = false,
+  latest = false,
 }: {
   release: Release;
-  open?: boolean;
+  latest?: boolean;
 }) {
   return (
-    <details className="release-entry" key={release.version} open={open}>
-      <summary>
-        <span className="release-version">
-          v{release.version}
-          {release.isLatest && <span className="version-badge">Latest</span>}
-        </span>
-        <span className="release-date">{dateLabel(release)}</span>
-        <span className="release-toggle">
-          Release notes <ChevronDown size={17} />
-        </span>
-      </summary>
+    <Disclosure
+      id={
+        latest
+          ? "latest-release"
+          : `release-${release.version.replaceAll(".", "-")}`
+      }
+      className="release-entry"
+      defaultOpen={latest}
+      headingLevel={2}
+      label={
+        <>
+          <span className="release-version">
+            v{release.version}
+            {release.isLatest && <span className="version-badge">Latest</span>}
+          </span>
+          <span className="release-date">{dateLabel(release)}</span>
+          <span className="release-toggle">
+            Release notes <ChevronDown size={17} />
+          </span>
+        </>
+      }
+    >
       <div className="release-body">
         {release.sections.length ? (
           release.sections.map((section, sectionIndex) => (
@@ -42,8 +55,8 @@ function ReleaseEntry({
             >
               <h3>{section.title}</h3>
               <ul>
-                {section.items.map((item, itemIndex) => (
-                  <li key={itemIndex}>{item}</li>
+                {section.items.map((item, index) => (
+                  <li key={index}>{item}</li>
                 ))}
               </ul>
             </section>
@@ -60,7 +73,7 @@ function ReleaseEntry({
           View v{release.version} on GitHub <ArrowUpRight size={15} />
         </a>
       </div>
-    </details>
+    </Disclosure>
   );
 }
 export function ReleasesList({ releases }: { releases: Release[] }) {
@@ -68,19 +81,25 @@ export function ReleasesList({ releases }: { releases: Release[] }) {
   if (!latest) return null;
   return (
     <div className="release-list">
-      <ReleaseEntry release={latest} open />
+      <ReleaseEntry release={latest} latest />
       {previous.length > 0 && (
-        <details className="previous-releases">
-          <summary>
-            Previous Releases <span>{previous.length} versions</span>
-            <ChevronDown size={17} />
-          </summary>
+        <Disclosure
+          id="previous-releases"
+          className="previous-releases"
+          headingLevel={2}
+          label={
+            <>
+              Previous Releases <span>{previous.length} versions</span>
+              <ChevronDown size={17} />
+            </>
+          }
+        >
           <div className="previous-release-list">
             {previous.map((release) => (
               <ReleaseEntry key={release.version} release={release} />
             ))}
           </div>
-        </details>
+        </Disclosure>
       )}
     </div>
   );

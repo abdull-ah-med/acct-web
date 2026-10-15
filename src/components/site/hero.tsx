@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { useReducedMotion } from "motion/react";
 import Link from "next/link";
@@ -258,7 +258,7 @@ function IdentityPreview() {
     </figure>
   );
 }
-export function Hero() {
+export function Hero({ downloads }: { downloads: ReactNode }) {
   return (
     <section className="home-hero" id="hero">
       <div className="hero-backdrop" aria-hidden>
@@ -275,7 +275,10 @@ export function Hero() {
             working in.
           </p>
           <div className="hero-actions">
-            <InstallButton />
+            <div className="hero-install">
+              <InstallButton />
+              {downloads}
+            </div>
             <Link href="/docs" className="hero-docs-link">
               Read the documentation <ArrowUpRight size={16} />
             </Link>

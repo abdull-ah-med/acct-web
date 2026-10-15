@@ -20,8 +20,9 @@ const links = [
   { href: "/#planes", id: "planes", label: "Git tools" },
   { href: "/#install", id: "install", label: "Setup" },
   { href: "/docs", id: "docs", label: "Docs" },
-  { href: "/#releases", id: "releases", label: "Releases" },
+  { href: "/releases", id: "releases", label: "Releases" },
   { href: "/#faq", id: "faq", label: "FAQ" },
+  { href: "/privacy", id: "privacy", label: "Privacy" },
 ];
 const ease = [0.23, 1, 0.32, 1] as const;
 
@@ -38,7 +39,9 @@ export function SiteHeader() {
   const focusLast = useRef(false);
   const menuId = useId();
   const compact = !onHome || homeCompact;
-  const active = onHome ? homeActive : pathname === "/docs" ? "docs" : "";
+  const active = onHome
+    ? homeActive
+    : (links.find((link) => link.href === pathname)?.id ?? "");
   const activeLink = links.find((link) => link.id === active);
 
   useEffect(() => {
@@ -209,7 +212,9 @@ export function SiteHeader() {
               transition={{ duration: reduceMotion ? 0 : 0.18 }}
             >
               {links
-                .filter((link) => link.id !== "install")
+                .filter(
+                  (link) => link.id !== "install" && link.id !== "privacy",
+                )
                 .map((link) => (
                   <Link
                     key={link.id}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Footer from "@/components/footer-1";
 import { SiteHeader } from "@/components/site/header";
+import { DocumentationLayout } from "@/components/docs/documentation-layout";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -29,38 +30,46 @@ export const metadata: Metadata = {
 
 const updated = "15 October 2026";
 
+const toc = [
+  { id: "who-we-are", label: "Who we are" },
+  { id: "what-this-policy-covers", label: "What this policy covers" },
+  { id: "information-we-collect", label: "Information we collect" },
+  {
+    id: "cookies-and-similar-technologies",
+    label: "Cookies and similar technologies",
+  },
+  {
+    id: "why-we-process-this-information",
+    label: "Why we process this information",
+  },
+  { id: "sharing", label: "Sharing" },
+  { id: "retention-and-location", label: "Retention and location" },
+  { id: "your-rights", label: "Your rights" },
+  { id: "children", label: "Children" },
+  { id: "changes", label: "Changes" },
+  { id: "contact", label: "Contact" },
+];
+
 export default function PrivacyPage() {
   return (
     <>
       <SiteHeader />
-      <main
-        id="main-content"
-        className="px-5 pt-28 pb-16 sm:px-8 md:pt-32 md:pb-20"
-      >
-        <article className="mx-auto max-w-3xl">
-          <p className="font-mono text-xs tracking-[0.18em] text-base-content/45 uppercase">
-            Legal
-          </p>
-          <h1 className="font-display mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-            Privacy policy
-          </h1>
-          <p className="mt-4 text-sm text-base-content/50">
-            Last updated {updated}. This notice describes the{" "}
-            <a
-              href={siteConfig.url}
-              className="underline decoration-base-content/25 underline-offset-4 hover:decoration-base-content/60"
-            >
-              acct website
-            </a>{" "}
-            at {siteConfig.url.replace(/^https:\/\//, "")}.
-          </p>
-
-          <div className="mt-12 space-y-10 text-base leading-relaxed text-base-content/75">
-            <section>
-              <h2 className="font-display text-2xl font-semibold tracking-tight text-base-content">
-                Who we are
-              </h2>
-              <p className="mt-3">
+      <main id="main-content" className="docs-main page-width">
+        <DocumentationLayout toc={toc}>
+          <header className="docs-heading">
+            <div>
+              <p className="eyebrow">Last updated {updated}</p>
+              <h1>Privacy policy</h1>
+              <p>
+                This notice explains how the acct website handles information
+                and how it relates to the CLI running on your machine.
+              </p>
+            </div>
+          </header>
+          <div className="policy-content">
+            <section className="docs-group policy-section" id="who-we-are">
+              <h2>Who we are</h2>
+              <p>
                 acct is an open-source CLI (npm:{" "}
                 <code className="font-mono text-sm">acct-sh</code>) maintained
                 by Abdullah Ahmed. This website is the public product page for
@@ -69,18 +78,19 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            <section>
-              <h2 className="font-display text-2xl font-semibold tracking-tight text-base-content">
-                What this policy covers
-              </h2>
-              <p className="mt-3">
+            <section
+              className="docs-group policy-section"
+              id="what-this-policy-covers"
+            >
+              <h2>What this policy covers</h2>
+              <p>
                 It covers visits to this website, including pages such as the
                 homepage, this policy, and public files like{" "}
                 <code className="font-mono text-sm">/llms.txt</code>. It does
                 not replace the privacy notices of third-party sites we link to
                 (GitHub, npm, Vercel).
               </p>
-              <p className="mt-3">
+              <p>
                 The{" "}
                 <strong className="font-medium text-base-content">
                   acct CLI
@@ -103,17 +113,18 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            <section>
-              <h2 className="font-display text-2xl font-semibold tracking-tight text-base-content">
-                Information we collect
-              </h2>
-              <p className="mt-3">
+            <section
+              className="docs-group policy-section"
+              id="information-we-collect"
+            >
+              <h2>Information we collect</h2>
+              <p>
                 We do not run first-party analytics, ads, or a newsletter. The
                 site has no login, no contact form, and no cookies that we set
                 to identify you. Copying an install command uses the browser
                 clipboard on your device only.
               </p>
-              <p className="mt-3">
+              <p>
                 This site is hosted on Vercel. Vercel&apos;s{" "}
                 <a
                   href="https://vercel.com/legal/privacy-notice"
@@ -130,7 +141,7 @@ export default function PrivacyPage() {
                 operate, secure, and deliver the site. We do not have a separate
                 visitor database on top of that hosting.
               </p>
-              <p className="mt-3">
+              <p>
                 To render release notes, the latest version, and cumulative npm
                 download counts, our servers (not your browser) fetch public
                 data from GitHub (
@@ -157,11 +168,12 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            <section>
-              <h2 className="font-display text-2xl font-semibold tracking-tight text-base-content">
-                Cookies and similar technologies
-              </h2>
-              <p className="mt-3">
+            <section
+              className="docs-group policy-section"
+              id="cookies-and-similar-technologies"
+            >
+              <h2>Cookies and similar technologies</h2>
+              <p>
                 We do not use advertising cookies, a cookie-consent banner, or
                 third-party analytics tags (no Google Analytics, Meta pixel, or
                 similar). Essential hosting and security behavior is controlled
@@ -170,11 +182,12 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            <section>
-              <h2 className="font-display text-2xl font-semibold tracking-tight text-base-content">
-                Why we process this information
-              </h2>
-              <p className="mt-3">
+            <section
+              className="docs-group policy-section"
+              id="why-we-process-this-information"
+            >
+              <h2>Why we process this information</h2>
+              <p>
                 Where data-protection law (including the GDPR) applies, hosting
                 and security logs are processed as needed to operate and protect
                 the site — typically legitimate interests in delivering a public
@@ -183,11 +196,9 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            <section>
-              <h2 className="font-display text-2xl font-semibold tracking-tight text-base-content">
-                Sharing
-              </h2>
-              <p className="mt-3">
+            <section className="docs-group policy-section" id="sharing">
+              <h2>Sharing</h2>
+              <p>
                 We do not sell personal information and we do not share it for
                 cross-context behavioral advertising. Infrastructure providers
                 that necessarily see request data to host the site include
@@ -197,11 +208,12 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            <section>
-              <h2 className="font-display text-2xl font-semibold tracking-tight text-base-content">
-                Retention and location
-              </h2>
-              <p className="mt-3">
+            <section
+              className="docs-group policy-section"
+              id="retention-and-location"
+            >
+              <h2>Retention and location</h2>
+              <p>
                 We do not keep a first-party store of visitor accounts. Hosting
                 logs follow Vercel&apos;s retention for the platform. Vercel
                 delivers the site over a global edge network; processing may
@@ -219,11 +231,9 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            <section>
-              <h2 className="font-display text-2xl font-semibold tracking-tight text-base-content">
-                Your rights
-              </h2>
-              <p className="mt-3">
+            <section className="docs-group policy-section" id="your-rights">
+              <h2>Your rights</h2>
+              <p>
                 Depending on where you live, you may have rights to access,
                 correct, delete, or restrict personal data, to object to certain
                 processing, and to lodge a complaint with a supervisory
@@ -233,7 +243,7 @@ export default function PrivacyPage() {
                 write to us with enough detail to identify the relevant traffic;
                 some log data is only available to the hosting provider.
               </p>
-              <p className="mt-3">
+              <p>
                 If you are in the EEA, UK, or Switzerland, you can also contact
                 your local data protection authority. If you are in California,
                 we do not sell or share personal information as those terms are
@@ -242,33 +252,27 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            <section>
-              <h2 className="font-display text-2xl font-semibold tracking-tight text-base-content">
-                Children
-              </h2>
-              <p className="mt-3">
-                This site is for developers. It is not directed at children
-                under 16, and we do not knowingly collect personal information
-                from children.
+            <section className="docs-group policy-section" id="children">
+              <h2>Children</h2>
+              <p>
+                This site is intended for developers and is not directed at
+                children under 16, and we do not knowingly collect personal
+                information from children.
               </p>
             </section>
 
-            <section>
-              <h2 className="font-display text-2xl font-semibold tracking-tight text-base-content">
-                Changes
-              </h2>
-              <p className="mt-3">
+            <section className="docs-group policy-section" id="changes">
+              <h2>Changes</h2>
+              <p>
                 If we add accounts, analytics, or other collection, we will
                 update this page and the date above. Material changes will be
                 reflected here before they apply to new collection.
               </p>
             </section>
 
-            <section>
-              <h2 className="font-display text-2xl font-semibold tracking-tight text-base-content">
-                Contact
-              </h2>
-              <p className="mt-3">
+            <section className="docs-group policy-section" id="contact">
+              <h2>Contact</h2>
+              <p>
                 Privacy questions: open an issue on the{" "}
                 <a
                   href="https://github.com/abdull-ah-med/acct/issues"
@@ -282,7 +286,7 @@ export default function PrivacyPage() {
               </p>
             </section>
           </div>
-        </article>
+        </DocumentationLayout>
       </main>
       <Footer />
     </>

@@ -21,8 +21,11 @@ function LenisBridge() {
     };
 
     const onAnchorClick = (event: MouseEvent) => {
+      if (event.defaultPrevented) return;
       const target = event.target as HTMLElement | null;
-      const anchor = target?.closest?.("a[href^='#']") as HTMLAnchorElement | null;
+      const anchor = target?.closest?.(
+        "a[href^='#']",
+      ) as HTMLAnchorElement | null;
       if (!anchor) return;
 
       const hash = anchor.getAttribute("href");

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { copyWithToast } from "@/lib/copy-toast";
 import { faqs } from "@/lib/faq";
+import { Disclosure } from "@/components/disclosure";
 
 function tabKeys(event: KeyboardEvent<HTMLElement>) {
   const tabs = Array.from(
@@ -352,13 +353,18 @@ export function FAQ() {
       </div>
       <div className="faq-list">
         {faqs.map((item) => (
-          <details key={item.question}>
-            <summary>
-              {item.question}
-              <ChevronDown size={18} />
-            </summary>
+          <Disclosure
+            key={item.question}
+            className="faq-item"
+            label={
+              <>
+                {item.question}
+                <ChevronDown size={18} />
+              </>
+            }
+          >
             <p>{item.answer}</p>
-          </details>
+          </Disclosure>
         ))}
       </div>
     </section>

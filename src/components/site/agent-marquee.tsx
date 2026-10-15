@@ -35,9 +35,6 @@ const AGENTS = [
     wordmark: "/brands/codex-text.svg",
     iconHeight: 24,
     wordmarkHeight: 18,
-    iconClass: "opacity-[0.48] group-hover:opacity-90",
-    wordmarkClass: "opacity-[0.62] group-hover:opacity-90",
-    skipItemFade: true,
   },
   {
     name: "OpenCode",
@@ -71,11 +68,7 @@ const AGENTS = [
   },
 ] as const;
 
-function BrandMark({
-  agent,
-}: {
-  agent: (typeof AGENTS)[number];
-}) {
+function BrandMark({ agent }: { agent: (typeof AGENTS)[number] }) {
   if ("kind" in agent && agent.kind === "kiro") {
     return (
       <span className="inline-flex items-center gap-2" aria-label="Kiro">
@@ -106,14 +99,14 @@ function BrandMark({
           src={agent.icon}
           alt=""
           height={agent.iconHeight}
-          className={`w-auto ${"iconClass" in agent ? agent.iconClass : ""}`}
+          className="w-auto"
           style={{ height: agent.iconHeight }}
         />
         <img
           src={agent.wordmark}
           alt={agent.name}
           height={agent.wordmarkHeight}
-          className={`w-auto ${"wordmarkClass" in agent ? agent.wordmarkClass : ""}`}
+          className="w-auto"
           style={{ height: agent.wordmarkHeight }}
         />
       </span>
@@ -126,7 +119,7 @@ function BrandMark({
       src={item.src}
       alt={item.name}
       height={item.height}
-      className={`w-auto ${item.invert ? "brightness-0 invert" : ""}`}
+      className={`w-auto ${item.invert ? "invert" : ""}`}
       style={{ height: item.height }}
     />
   );
@@ -143,11 +136,7 @@ function Track({ copy }: { copy: number }) {
       {AGENTS.map((agent) => (
         <li
           key={`${copy}-${agent.name}`}
-          className={`group flex shrink-0 items-center grayscale transition-[opacity,filter] duration-(--duration-popover) ease-out hover:grayscale-0 ${
-            "skipItemFade" in agent && agent.skipItemFade
-              ? "hover:opacity-90"
-              : "opacity-[0.48] hover:opacity-90"
-          }`}
+          className="agent-mark flex shrink-0 items-center opacity-90 transition-[opacity,transform] duration-200 ease-out hover:opacity-100 hover:-translate-y-0.5"
         >
           <BrandMark agent={agent} />
         </li>
