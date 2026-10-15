@@ -2,22 +2,28 @@
 
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { motion, useReducedMotion } from "motion/react";
-import { copyWithToast } from "@/lib/copy-toast";
-import { INSTALL_COMMAND } from "@/lib/terminal";
+import { useReducedMotion } from "motion/react";
+import Link from "next/link";
 import {
-  AnimatedSpan,
-  Terminal,
-  TypingAnimation,
-} from "@/components/ui/terminal";
+  ArrowUpRight,
+  Check,
+  ChevronRight,
+  Copy,
+  Folder,
+  FolderOpen,
+  GitBranch,
+  KeyRound,
+  ShieldCheck,
+} from "lucide-react";
+import { GithubMark } from "@/components/github-mark";
+import { copyWithToast } from "@/lib/copy-toast";
 import { AgentMarquee } from "@/components/site/agent-marquee";
+import { INSTALL_COMMAND } from "@/lib/terminal";
 
 const Silk = dynamic(() => import("@/components/Silk"), {
   ssr: false,
   loading: () => <div className="absolute inset-0 bg-[#2a2c30]" aria-hidden />,
 });
-
-const easeOut = [0.23, 1, 0.32, 1] as const;
 
 function HeroBackdrop() {
   const reduce = useReducedMotion();
@@ -41,7 +47,10 @@ function HeroBackdrop() {
     }
 
     return () => {
-      if (idleId !== undefined && typeof window.cancelIdleCallback === "function") {
+      if (
+        idleId !== undefined &&
+        typeof window.cancelIdleCallback === "function"
+      ) {
         window.cancelIdleCallback(idleId);
       }
       if (timeoutId !== undefined) window.clearTimeout(timeoutId);
@@ -53,7 +62,8 @@ function HeroBackdrop() {
     if (!el || reduce) return;
 
     const io = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting && entry.intersectionRatio > 0.02),
+      ([entry]) =>
+        setInView(entry.isIntersecting && entry.intersectionRatio > 0.02),
       { threshold: [0, 0.02, 0.1], rootMargin: "10% 0px" },
     );
     io.observe(el);
@@ -67,145 +77,215 @@ function HeroBackdrop() {
     return () => document.removeEventListener("visibilitychange", onVis);
   }, []);
 
-  if (reduce) {
-    return (
-      <div
-        className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_40%,#3a3d44_0%,#141414_55%,#0a0a0a_100%)]"
-        aria-hidden
-      />
-    );
-  }
-
   return (
-    <div ref={hostRef} className="absolute inset-0 contain-paint" aria-hidden>
-      {ready ? (
+    <div
+      ref={hostRef}
+      className="absolute inset-0 contain-paint bg-[radial-gradient(ellipse_at_30%_40%,#3a3d44_0%,#141414_55%,#0a0a0a_100%)]"
+      aria-hidden
+    >
+      {ready && !reduce && (
         <Silk
-          speed={8}
+          speed={4}
           scale={1.15}
           color="#4e5259"
-          noiseIntensity={3.5}
+          noiseIntensity={2}
           rotation={1.7}
           active={inView && pageVisible}
         />
-      ) : (
-        <div className="absolute inset-0 bg-[#2a2c30]" />
       )}
     </div>
   );
 }
 
-export function Hero() {
+export function InstallButton() {
   const [copied, setCopied] = useState(false);
-  const reduce = useReducedMotion();
-
-  const onCopy = async () => {
-    const ok = await copyWithToast(INSTALL_COMMAND);
-    if (!ok) return;
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1500);
-  };
-
-  const enter = (y: number, delay: number, duration = 0.55) =>
-    reduce
-      ? { initial: false as const, animate: { opacity: 1 }, transition: { duration: 0.2 } }
-      : {
-          initial: { opacity: 0, transform: `translateY(${y}px)` },
-          animate: { opacity: 1, transform: "translateY(0px)" },
-          transition: { duration, delay, ease: easeOut },
-        };
-
+  async function copy() {
+    if (await copyWithToast(INSTALL_COMMAND)) {
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    }
+  }
   return (
-    <section
-      id="hero"
-      className="relative flex min-h-dvh min-w-0 flex-col overflow-hidden"
+    <button
+      type="button"
+      onClick={copy}
+      className="install-copy"
+      aria-label="Copy npm install command"
     >
-      <div className="pointer-events-none absolute inset-0" aria-hidden>
-        <HeroBackdrop />
+      <span aria-hidden className="command-dollar">
+        $
+      </span>
+      <code>{INSTALL_COMMAND}</code>
+      {copied ? <Check size={17} /> : <Copy size={17} />}
+      <span className="sr-only" aria-live="polite">
+        {copied ? "Copied to clipboard" : ""}
+      </span>
+    </button>
+  );
+}
+const folders = [
+  {
+    id: "work",
+    name: "Work",
+    path: "~/Work/api",
+    profile: "work",
+    user: "you-at-work",
+    email: "you@company.com",
+    letter: "W",
+    status: "Bound to work",
+    command: "expected=you-at-work",
+    tone: "work",
+  },
+  {
+    id: "personal",
+    name: "Personal",
+    path: "~/Personal/blog",
+    profile: "personal",
+    user: "you-on-github",
+    email: "you@personal.dev",
+    letter: "P",
+    status: "Bound to personal",
+    command: "expected=you-on-github",
+    tone: "personal",
+  },
+  {
+    id: "downloads",
+    name: "Downloads",
+    path: "~/Downloads",
+    profile: "unbound",
+    user: "No acct profile",
+    email: "No managed identity",
+    letter: "—",
+    status: "No profile inherited",
+    command: "actual=unknown (unbound directory)",
+    tone: "unbound",
+  },
+];
+function IdentityPreview() {
+  const [selected, setSelected] = useState("work");
+  const folder = folders.find((item) => item.id === selected)!;
+  return (
+    <figure id="demo" className={`identity-preview ${folder.tone}`}>
+      <div className="workspace-toolbar">
+        <span>
+          <Folder size={15} /> ~/workspace
+        </span>
+        <span className="preview-label">Example profiles</span>
       </div>
-      <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-base-100/55 via-base-100/35 to-base-100/75 md:bg-gradient-to-r md:from-base-100/65 md:via-base-100/35 md:to-base-100/15"
-        aria-hidden
-      />
-
-      <div className="relative z-10 mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col items-stretch justify-center gap-10 px-4 pt-28 pb-10 text-left sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:pt-24 lg:pb-6">
-        <div className="max-w-2xl max-md:mx-auto max-md:w-full max-md:text-center md:mx-0">
-          <motion.h1
-            {...enter(18, 0.05, 0.6)}
-            className="font-display text-[clamp(3.25rem,12vw,7.5rem)] leading-[0.88] font-extrabold tracking-tight text-base-content max-md:text-center"
-          >
-            acct
-          </motion.h1>
-
-          <motion.p
-            {...enter(14, 0.1, 0.55)}
-            className="font-display mt-6 max-w-xl text-2xl leading-snug font-medium tracking-tight text-base-content max-md:mx-auto sm:text-3xl md:text-4xl"
-          >
-            Switch GitHub accounts by folder. Automatically.
-          </motion.p>
-
-          <motion.p
-            {...enter(12, 0.18, 0.5)}
-            className="mt-5 max-w-lg text-base leading-relaxed text-base-content/70 max-md:mx-auto sm:text-lg"
-          >
-            Bind a directory to a GitHub user, email, and token. Open that folder and you are
-            that account. Leave it and that identity is gone. No global switch. No wrong-account
-            pushes.
-          </motion.p>
-
-          <motion.div
-            {...enter(10, 0.26, 0.45)}
-            className="mt-8 flex flex-wrap items-center gap-3 max-md:justify-center"
-          >
+      <div className="workspace-content">
+        <div className="workspace-tree">
+          <span className="tree-home">~ /</span>
+          {folders.map((item) => (
             <button
               type="button"
-              onClick={onCopy}
-              className="cta-btn cta-btn-primary font-mono"
-              aria-label={copied ? "Copied" : `Copy ${INSTALL_COMMAND}`}
+              key={item.id}
+              onClick={() => setSelected(item.id)}
+              aria-pressed={selected === item.id}
+              aria-label={`Select ${item.name} folder`}
+              className={`folder-choice ${selected === item.id ? "selected" : ""}`}
             >
-              {copied ? "copied" : INSTALL_COMMAND}
+              <ChevronRight size={13} />
+              {selected === item.id ? (
+                <FolderOpen size={18} />
+              ) : (
+                <Folder size={18} />
+              )}
+              <span>{item.name}</span>
+              {selected === item.id && <span className="folder-dot" />}
             </button>
-            <a href="#demo" className="cta-btn cta-btn-outline">
-              See how it works
-            </a>
-          </motion.div>
+          ))}
         </div>
-
-        <motion.div
-          {...enter(20, 0.22, 0.65)}
-          className="w-full min-w-0 max-w-lg max-md:mx-auto"
-        >
-          <Terminal
-            className="max-h-none max-w-none bg-base-100"
-            sequence={!reduce}
-          >
-            <TypingAnimation duration={28}>$ cd ~/Work/api</TypingAnimation>
-            <TypingAnimation duration={28}>$ acct status</TypingAnimation>
-            <AnimatedSpan className="text-muted-foreground">
-              cwd: /Users/you/Work/api
-            </AnimatedSpan>
-            <AnimatedSpan className="text-muted-foreground">reason: binding</AnimatedSpan>
-            <AnimatedSpan className="text-muted-foreground">enforce: strict</AnimatedSpan>
-            <AnimatedSpan className="text-muted-foreground">
-              binding: /Users/you/Work
-            </AnimatedSpan>
-            <AnimatedSpan className="text-muted-foreground">profile: work</AnimatedSpan>
-            <AnimatedSpan className="text-muted-foreground">
-              github: your-work-user@github.com
-            </AnimatedSpan>
-            <AnimatedSpan className="text-muted-foreground">
-              identity: Your Name &lt;you@company.com&gt;
-            </AnimatedSpan>
-            <AnimatedSpan className="text-muted-foreground">protocol: https</AnimatedSpan>
-            <AnimatedSpan className="text-green-500">token: present (keychain)</AnimatedSpan>
-            <AnimatedSpan className="text-muted-foreground">
-              auth principal: your-work-user
-            </AnimatedSpan>
-          </Terminal>
-        </motion.div>
+        <div className="identity-details" aria-live="polite" aria-atomic="true">
+          <div className="identity-kicker">
+            CURRENT IDENTITY <span className="status-dot" />
+          </div>
+          <div className="profile-heading">
+            <span className="profile-avatar">{folder.letter}</span>
+            <div>
+              <span className="profile-name">{folder.profile}</span>
+              <span className="profile-caption">
+                {selected === "downloads"
+                  ? "outside your bound folders"
+                  : "directory-bound profile"}
+              </span>
+            </div>
+          </div>
+          <dl className="identity-fields">
+            <div>
+              <dt>
+                <GithubMark size={14} /> GitHub
+              </dt>
+              <dd>{folder.user}</dd>
+            </div>
+            <div>
+              <dt>
+                <GitBranch size={14} /> Git identity
+              </dt>
+              <dd>{folder.email}</dd>
+            </div>
+            <div>
+              <dt>
+                <KeyRound size={14} /> Credentials
+              </dt>
+              <dd>
+                {selected === "downloads"
+                  ? "No account carried over"
+                  : "OS keychain"}
+              </dd>
+            </div>
+          </dl>
+          <div className="identity-status">
+            <ShieldCheck size={15} />
+            {folder.status}
+          </div>
+        </div>
       </div>
-
+      <div className="preview-terminal" aria-live="polite">
+        <p>
+          <span>$</span> cd {folder.path}
+        </p>
+        <p>
+          <span>$</span> acct whoami
+        </p>
+        <p className="terminal-answer">
+          {folder.command}
+          <span className="terminal-cursor" aria-hidden>
+            ▍
+          </span>
+        </p>
+      </div>
+      <figcaption>Select a folder to see which profile applies.</figcaption>
+    </figure>
+  );
+}
+export function Hero() {
+  return (
+    <section className="home-hero" id="hero">
+      <div className="hero-backdrop" aria-hidden>
+        <HeroBackdrop />
+      </div>
+      <div className="hero-shade" aria-hidden />
+      <div className="hero-section page-width">
+        <div className="hero-copy">
+          <h1>acct</h1>
+          <h2>Use the right GitHub account in every folder.</h2>
+          <p className="hero-description">
+            Bind a directory to a GitHub account so your Git identity,
+            authentication, and managed gh commands follow the folder you’re
+            working in.
+          </p>
+          <div className="hero-actions">
+            <InstallButton />
+            <Link href="/docs" className="hero-docs-link">
+              Read the documentation <ArrowUpRight size={16} />
+            </Link>
+          </div>
+        </div>
+        <div className="hero-visual">
+          <IdentityPreview />
+        </div>
+      </div>
       <AgentMarquee />
-      <div className="hairline absolute inset-x-0 bottom-0 z-10" />
     </section>
   );
 }

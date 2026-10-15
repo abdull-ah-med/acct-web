@@ -53,7 +53,7 @@ Do not invent ambient env overrides that beat directory resolution. Ambient `ACC
 | Symptom | First command |
 |---------|----------------|
 | Wrong account in a folder | `acct status` then `acct doctor` — both print what's wrong, fix commands, and whether commit/push will go through |
-| `token: missing` / `LEAK RISK` | Re-auth that GitHub user in gh: `gh auth switch --hostname <host> --user <profile-user>` then `gh auth refresh --hostname <host>` (`login` has no `--user`; `refresh` has no `--user` — it refreshes the active account). If switch fails, `gh auth login --hostname <host> --web`. Then `acct profile token <id> --import-gh`. In `strict`, push is blocked; commit uses includeIf identity. Raw `gh` without `acct exec` is the leak. |
+| `token: missing` / `LEAK RISK` | Re-auth that GitHub user in gh: `gh auth switch --hostname <host> --user <profile-user>` then `gh auth refresh --hostname <host>` (`login` has no `--user`; `refresh` has no `--user` — it refreshes the active account). If switch fails, `gh auth login --hostname <host> --web`. Re-import is optional when following gh; use `acct profile token <id> --stdin` for a dedicated PAT. In `strict`, push is blocked; commit uses includeIf identity. Raw `gh` without `acct exec` is the leak. |
 | Sticky token after leaving a tree | `acct doctor`; ensure shell hook is installed |
 | Competing osxkeychain / libsecret / gh helpers | `acct doctor` → `acct install` |
 | Keychain / secrets issues | `acct doctor` (look for `keyring-*` / `secrets-json-*`) |
@@ -66,3 +66,12 @@ Do not invent ambient env overrides that beat directory resolution. Ambient `ACC
 - Full LLM context: https://acct-web.vercel.app/llms-full.txt
 - npm: https://www.npmjs.com/package/acct-sh
 - Source: https://github.com/abdull-ah-med/acct
+
+## Current release behavior (0.2.0)
+
+- After upgrading, run `acct install` once. It installs global v3 chaining hooks; `--repo` handles a local hooksPath override. Existing hooks are chained and uninstall restores recorded paths.
+- `.acct` belongs at the repository root. Subroot markers are ignored. Use `acct local set <profile>`, `acct local set --unbound`, or `acct local clear`; use `acct rebind <old> <new>` for moved directory trees. Strict cross-profile worktrees are refused.
+- `acct whoami` exits 0 for match, 1 for mismatch, 2 for unknown.
+- Bash refreshes at the next prompt. For `cd repo && gh …`, recommend `acct exec gh …` or the gh wrapper. Persist shell hooks explicitly; do not claim startup files were changed by acct.
+- Offline doctor does not query APIs or persist gh token values. Existing plaintext-to-keychain migration is permitted in every process and removes migrated plaintext copies.
+- Pre-push re-checks outgoing recorded identities and actual authentication. Post-commit is pass-through; never-pushed commits are not re-checked. Hooks are bypassable; use server-side policy for mandatory enforcement.

@@ -1,8 +1,8 @@
 # acct
 
-> Directory-scoped GitHub identity and auth. One folder. One account. No leaks.
+> acct connects each folder to a GitHub account so commit identity and managed authentication follow your directory.
 
-acct (npm package: **acct-sh**) binds a directory tree to one GitHub user, git identity, and credential. Walk into the tree → that account is active. Walk out → it is gone. Local always wins; fail closed when unbound under strict mode.
+acct (npm package: **acct-sh**) binds a directory tree to one GitHub user, git identity, and credential. The profile applies inside that directory tree, with local overrides taking precedence and strict managed operations failing closed outside bound trees.
 
 Official `gh` documents automatic switching by directory as **out of scope**. acct owns that gap.
 
@@ -23,7 +23,7 @@ npm install -g acct-sh
 - [npm: acct-sh](https://www.npmjs.com/package/acct-sh): Install + registry metadata
 - [GitHub repo](https://github.com/abdull-ah-med/acct): Source, CHANGELOG, threat model, invariants
 - [Threat model](https://github.com/abdull-ah-med/acct/blob/main/docs/threat-model.md): Security boundaries
-- [Invariants](https://github.com/abdull-ah-med/acct/blob/main/docs/invariants.md): Behavioral contracts (I1–I21)
+- [Invariants](https://github.com/abdull-ah-med/acct/blob/main/docs/invariants.md): Behavioral contracts (I1–I23)
 
 ## Quick start
 
@@ -64,15 +64,18 @@ Do **not** confuse acct with:
 | Command | Purpose |
 |---------|---------|
 | `acct init` | Profile + binding + install |
-| `acct bind` / `unbind` | Directory → profile |
+| `acct bind` / `unbind` / `rebind` | Canonical directory → profile |
+| `acct local set` / `clear` | Repository-root profile override |
 | `acct profile …` | Manage profiles / tokens / SSH keys |
 | `acct status` / `whoami` | Current resolution; status explains problems + fix + commit/push impact |
 | `acct doctor` | Conflict / keychain scan + cwd diagnosis when unhealthy |
 | `acct exec -- <cmd>` | Run with correct `GH_TOKEN` |
 | `acct hook <shell>` | Shell integration |
-| `acct install` / `uninstall` | Wire / remove git includeIf + hooks |
+| `acct install [--repo]` / `uninstall` | Global chaining hooks by default; restore prior paths on uninstall |
 
 ## Optional
 
 - [GitHub Packages twin](https://github.com/abdull-ah-med/acct/pkgs/npm/acct-sh): `@abdull-ah-med/acct-sh` (same bins)
 - [Repo AGENTS.md](https://github.com/abdull-ah-med/acct/blob/main/AGENTS.md): Contributor / implementer rules
+
+Current release: 0.2.0. After upgrading, run `acct install` once to regenerate scoped includes and v3 hooks. Profiles and bindings carry over.

@@ -7,10 +7,10 @@ export const siteConfig = {
   name: "acct",
   title: "acct — Switch GitHub accounts by folder",
   description:
-    "Directory-scoped GitHub identity and auth. Bind a folder to a GitHub user, email, and token — enter the tree and that account is active. Leave and it is gone.",
+    "Directory-scoped GitHub identity and auth. Bind each GitHub account to a folder. Commit identity, Git authentication, and managed gh commands follow your directory.",
   /** Longer pitch for JSON-LD / llms-full. */
   longDescription:
-    "acct (npm: acct-sh) is a CLI that binds a directory tree to one GitHub account, git identity, and credential. It wires includeIf identity, an HTTPS credential helper, IdentitiesOnly SSH, GH_TOKEN injection for gh, and optional pre-commit/pre-push enforcement. Local always wins; fail closed when unbound under strict mode. Official gh documents automatic directory switching as out of scope — acct owns that gap.",
+    "acct (npm: acct-sh) is a CLI that binds a directory tree to one GitHub account, git identity, and credential. It wires includeIf identity, an HTTPS credential helper, IdentitiesOnly SSH, GH_TOKEN injection for gh, and global chaining pre-commit/pre-merge-commit/pre-push hooks. Local always wins; fail closed when unbound under strict mode. Official gh documents automatic directory switching as out of scope — acct owns that gap.",
   keywords: [
     "git",
     "github",
@@ -43,8 +43,7 @@ export const siteConfig = {
       "https://github.com/abdull-ah-med/acct/blob/main/docs/threat-model.md",
     invariants:
       "https://github.com/abdull-ah-med/acct/blob/main/docs/invariants.md",
-    changelog:
-      "https://github.com/abdull-ah-med/acct/blob/main/CHANGELOG.md",
+    changelog: "https://github.com/abdull-ah-med/acct/blob/main/CHANGELOG.md",
     agents: "https://github.com/abdull-ah-med/acct/blob/main/AGENTS.md",
   },
   install: "npm install -g acct-sh",

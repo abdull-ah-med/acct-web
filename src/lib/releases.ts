@@ -32,6 +32,7 @@ type GhRelease = {
   published_at: string | null;
   prerelease: boolean;
   draft: boolean;
+  body?: string;
 };
 
 type ChangelogEntry = {
@@ -63,7 +64,9 @@ function parseChangelog(markdown: string): ChangelogEntry[] {
   };
 
   for (const line of lines) {
-    const heading = line.match(/^## \[([^\]]+)\](?:\s*-\s*(\d{4}-\d{2}-\d{2}))?/);
+    const heading = line.match(
+      /^## \[([^\]]+)\](?:\s*-\s*(\d{4}-\d{2}-\d{2}))?/,
+    );
     if (heading) {
       flush();
       current = { version: heading[1], date: heading[2] ?? null, body: "" };
@@ -75,35 +78,58 @@ function parseChangelog(markdown: string): ChangelogEntry[] {
   return entries;
 }
 
-function parseSections(body: string, maxItemsPerSection = 6): ReleaseSection[] {
+function parseSections(body: string): ReleaseSection[] {
   const sections: ReleaseSection[] = [];
   let current: ReleaseSection | null = null;
+  let continuing = false;
+  let fenced = false;
 
   for (const raw of body.split(/\r?\n/)) {
     const line = raw.trim();
-    if (!line) continue;
-
-    const section = line.match(/^###\s+(.+)$/);
-    if (section) {
-      current = { title: section[1].trim(), items: [] };
-      sections.push(current);
+    if (/^(```|~~~)/.test(line)) {
+      fenced = !fenced;
       continue;
     }
-
-    const bullet = line.match(/^[-*]\s+(.+)$/);
-    if (bullet && current && current.items.length < maxItemsPerSection) {
-      current.items.push(stripMarkdown(bullet[1]));
+    if (!line) {
+      continuing = false;
+      continue;
     }
+    const heading = !fenced && line.match(/^#{2,6}\s+(.+)$/);
+    if (heading) {
+      current = { title: stripMarkdown(heading[1]), items: [] };
+      sections.push(current);
+      continuing = false;
+      continue;
+    }
+    if (/^\[[^\]]+\]:/.test(line) || /^---+$/.test(line)) continue;
+    if (!current) {
+      current = { title: "Overview", items: [] };
+      sections.push(current);
+    }
+    const bullet = !fenced && line.match(/^(?:[-*+] |\d+\. )(.+)$/);
+    if (bullet) {
+      current.items.push(bullet[1]);
+    } else if (current.items.length && (continuing || /^\s+/.test(raw))) {
+      current.items[current.items.length - 1] += ` ${line}`;
+    } else {
+      current.items.push(line);
+    }
+    continuing = true;
   }
-
-  return sections.filter((s) => s.items.length > 0);
+  return sections
+    .filter((section) => section.items.length)
+    .map((section) => ({
+      ...section,
+      items: section.items.map(stripMarkdown),
+    }));
 }
 
 async function fetchJson<T>(url: string): Promise<T | null> {
   try {
     const res = await fetch(url, {
       next: { revalidate: REVALIDATE },
-      headers: { Accept: "application/json", "User-Agent": "acct-web" },
+      signal: AbortSignal.timeout(8000),
+      headers: { Accept: "application/json", "User-Agent": "acct-web/0.2" },
     });
     if (!res.ok) return null;
     return (await res.json()) as T;
@@ -116,7 +142,8 @@ async function fetchText(url: string): Promise<string | null> {
   try {
     const res = await fetch(url, {
       next: { revalidate: REVALIDATE },
-      headers: { "User-Agent": "acct-web" },
+      signal: AbortSignal.timeout(8000),
+      headers: { "User-Agent": "acct-web/0.2" },
     });
     if (!res.ok) return null;
     return await res.text();
@@ -166,14 +193,14 @@ export async function getReleases(limit = 6): Promise<ReleasesPayload> {
     })
     .filter((r) => r.sections.length > 0);
 
-  // If CHANGELOG fetch failed, fall back to GitHub release titles only
+  // Keep complete GitHub release bodies when the changelog is unavailable.
   if (!releases.length && ghReleases?.length) {
     for (const gh of ghReleases.filter((r) => !r.draft).slice(0, limit)) {
       const version = tagToVersion(gh.tag_name);
       releases.push({
         version,
         date: gh.published_at?.slice(0, 10) ?? null,
-        sections: [],
+        sections: parseSections(gh.body ?? ""),
         htmlUrl: gh.html_url,
         publishedAt: gh.published_at,
         isLatest: Boolean(latestNpm && version === latestNpm),

@@ -1,116 +1,57 @@
-import { BackToTopButton } from "@/components/back-to-top";
-import FadeContent from "@/components/FadeContent";
-import { HomeBrandLink } from "@/components/home-brand-link";
-
-const footerLinks = [
-  {
-    name: "Product",
-    links: [
-      { href: "/#install", id: "install", label: "install" },
-      { href: "/#demo", id: "demo", label: "how it works" },
-      { href: "/#planes", id: "planes", label: "what it controls" },
-      { href: "/docs", id: "docs", label: "docs" },
-      { href: "/#releases", id: "releases", label: "releases" },
-      { href: "/#faq", id: "faq", label: "faq" },
-    ],
-  },
-  {
-    name: "Docs",
-    links: [
-      { href: "/docs", label: "Commands" },
-      {
-        href: "https://github.com/abdull-ah-med/acct/blob/main/README.md",
-        label: "README",
-      },
-      {
-        href: "https://github.com/abdull-ah-med/acct/blob/main/CHANGELOG.md",
-        label: "Changelog",
-      },
-      {
-        href: "https://github.com/abdull-ah-med/acct/blob/main/docs/invariants.md",
-        label: "Invariants",
-      },
-      {
-        href: "https://github.com/abdull-ah-med/acct/blob/main/docs/threat-model.md",
-        label: "Threat model",
-      },
-    ],
-  },
-  {
-    name: "Community",
-    links: [
-      { href: "https://github.com/abdull-ah-med/acct", label: "GitHub" },
-      {
-        href: "https://www.npmjs.com/package/acct-sh",
-        label: "npm",
-      },
-      {
-        href: "https://github.com/abdull-ah-med/acct/releases",
-        label: "Releases",
-      },
-      {
-        href: "https://github.com/abdull-ah-med/acct/issues",
-        label: "Issues",
-      },
-    ],
-  },
-  {
-    name: "Legal",
-    links: [{ href: "/privacy", label: "Privacy" }],
-  },
-];
-
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 export default function Footer() {
   return (
-    <footer className="overflow-x-hidden overflow-y-hidden border-t border-base-content/10 bg-base-100">
-      <div className="mx-auto max-w-7xl px-4 pt-12 pb-2 sm:px-6 md:pt-16 md:pb-3">
-        <FadeContent>
-          <div className="flex flex-col items-center gap-4 text-center md:flex-row md:items-start md:justify-between md:text-left">
-            <div className="mx-auto max-w-sm md:mx-0 md:max-w-none">
-              <HomeBrandLink imageSize={28} labelClassName="text-lg" className="gap-2.5" />
-              <p className="mt-3 text-sm leading-relaxed text-base-content/50">
-                Bind folders to GitHub accounts so commits, pushes, and gh stay on the right
-                identity.
-              </p>
-              <p className="mt-3 font-mono text-[11px] text-base-content/35">MIT · 2026</p>
-            </div>
-            <BackToTopButton />
-          </div>
-        </FadeContent>
-
-        <FadeContent delay={80}>
-          <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-8 border-t border-base-content/10 pt-10 sm:grid-cols-4 sm:gap-x-8 lg:gap-x-12">
-            {footerLinks.map((group) => (
-              <nav key={group.name} aria-label={group.name}>
-                <p className="font-mono text-[10px] tracking-[0.18em] text-base-content/40 uppercase sm:text-[11px]">
-                  {group.name}
-                </p>
-                <ul className="mt-3 space-y-2 sm:mt-4 sm:space-y-2.5">
-                  {group.links.map((link) => (
-                    <li key={link.href}>
-                      <a
-                        href={link.href}
-                        className="text-[13px] text-base-content/60 transition-colors hover:text-base-content sm:text-sm"
-                        {...(link.href.startsWith("http")
-                          ? { target: "_blank", rel: "noreferrer" }
-                          : {})}
-                      >
-                        {link.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            ))}
-          </div>
-        </FadeContent>
+    <footer className="site-footer page-width">
+      <div className="footer-top">
+        <div>
+          <Link href="/" className="wordmark" aria-label="acct home">
+            <Image
+              src="/logo.svg"
+              width={30}
+              height={30}
+              alt=""
+              className="brand-icon"
+            />
+            <span>
+              acct<span className="brand-period">.</span>
+            </span>
+          </Link>
+          <p>acct keeps your GitHub accounts tied to their folders.</p>
+        </div>
+        <nav aria-label="Footer navigation">
+          <Link href="/docs">Documentation</Link>
+          <a
+            href="https://github.com/abdull-ah-med/acct"
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub <ArrowUpRight size={13} />
+          </a>
+          <a
+            href="https://www.npmjs.com/package/acct-sh"
+            target="_blank"
+            rel="noreferrer"
+          >
+            npm <ArrowUpRight size={13} />
+          </a>
+          <Link href="/privacy">Privacy</Link>
+        </nav>
       </div>
-
-      <div
-        className="relative h-[0.7em] overflow-hidden text-[clamp(8.5rem,28vw,18rem)] leading-none select-none"
-        aria-hidden="true"
-      >
-        <p className="stroke-mark m-0 text-[1em] leading-none">acct</p>
+      <div className="footer-bottom">
+        <p>© {new Date().getFullYear()} acct · MIT licensed</p>
+        <p>
+          Made by{" "}
+          <a
+            href="https://github.com/abdull-ah-med"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Abdullah Ahmed <ArrowUpRight size={12} />
+          </a>
+        </p>
+        <a href="#top">Back to top ↑</a>
       </div>
     </footer>
   );

@@ -12,7 +12,14 @@ declare global {
 
 /** Smooth scroll to top via Lenis when available, else rAF fallback. */
 export function scrollToTopSmooth(lenis?: Lenis | null) {
-  const instance = lenis ?? (typeof window !== "undefined" ? window.__acctLenis : undefined);
+  const instance =
+    lenis ?? (typeof window !== "undefined" ? window.__acctLenis : undefined);
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (instance) instance.scrollTo(0, { immediate: true, force: true });
+    else window.scrollTo({ top: 0, behavior: "instant" });
+    return;
+  }
 
   if (instance) {
     const distance = Math.abs(instance.scroll);
@@ -44,10 +51,11 @@ export function scrollToTopSmooth(lenis?: Lenis | null) {
 
 export function scrollToElementSmooth(
   el: HTMLElement,
-  options?: { offset?: number; lenis?: Lenis | null }
+  options?: { offset?: number; lenis?: Lenis | null },
 ) {
   const instance =
-    options?.lenis ?? (typeof window !== "undefined" ? window.__acctLenis : undefined);
+    options?.lenis ??
+    (typeof window !== "undefined" ? window.__acctLenis : undefined);
   const offset = options?.offset ?? -88;
 
   if (instance) {
@@ -55,16 +63,21 @@ export function scrollToElementSmooth(
     const distance = Math.abs(instance.scroll - target);
     const duration = Math.min(2, Math.max(0.85, distance / 1800));
 
-    instance.scrollTo(el, {
-      offset,
+    // A numeric target avoids applying CSS scroll-margin in addition to our offset.
+    instance.scrollTo(target, {
+      immediate: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
       duration,
       easing: easeOutCubic,
-      immediate: false,
       force: true,
     });
     return;
   }
 
   const top = el.getBoundingClientRect().top + window.scrollY + offset;
-  window.scrollTo({ top, behavior: "smooth" });
+  window.scrollTo({
+    top,
+    behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? "instant"
+      : "smooth",
+  });
 }

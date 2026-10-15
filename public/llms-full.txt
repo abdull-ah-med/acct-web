@@ -6,7 +6,7 @@ Website: https://acct-web.vercel.app/
 Repository: https://github.com/abdull-ah-med/acct  
 License: MIT  
 Node: >= 20  
-Current series: 0.1.x
+Current release: 0.2.0 (2026-10-12)
 
 ## One-line summary
 
@@ -17,7 +17,7 @@ Directory-scoped GitHub identity and auth — one GitHub account, one git identi
 - `user.name` / `user.email` are not auth
 - `gh auth switch` is global
 - HTTPS credentials are host-scoped by default
-- SSH agents offer every key unless `IdentitiesOnly` is forced
+- IdentitiesOnly excludes agent keys; keys configured for that host can still be offered, so acct verifies the authenticated account on push
 - Crossing a directory boundary can silently push as the wrong person
 - Official `gh` documents automatic directory switching as out of scope
 
@@ -26,16 +26,16 @@ Directory-scoped GitHub identity and auth — one GitHub account, one git identi
 | Plane | Behavior |
 |-------|----------|
 | Identity | git `includeIf` — `user.name` / `user.email` per directory |
-| HTTPS | `git-credential-acct` returns this profile's token; `quit=true` on strict failure |
+| HTTPS | `git-credential-acct` returns this profile's token; `quit=1` on strict managed-host failure |
 | SSH | `core.sshCommand` with `IdentitiesOnly=yes` |
 | gh | Injects `GH_TOKEN` from the OS keychain — no `gh auth switch` |
-| Enforce | pre-commit / pre-push hooks in `strict` mode |
+| Enforce | global v3 chaining hooks: pre-commit, pre-merge-commit, and pre-push; post-commit is pass-through |
 
 ## Resolution order
 
 1. CLI `--profile` (explicit; gh plane / status)
-2. Repo-local `.acct`
-3. Longest matching directory binding
+2. Nearest `.acct` from the Git worktree root upward (cwd outside Git); subroot markers are ignored and reported
+3. Longest canonical directory binding; strict worktree/gitdir profile conflicts fail closed
 4. Unbound
 
 Ambient `ACCT_PROFILE` does **not** override the git credential helper or hooks — directory wins.
@@ -71,7 +71,9 @@ acct doctor
 
 - `acct --help` — full command list with descriptions (includes `bind` / `unbind`)
 - `acct init` — create profile + bind directory + install
-- `acct bind <dir> <profileId>` — bind a tree
+- `acct bind <dir> <profileId>` — bind a canonical parent tree or repository root
+- `acct rebind <old> <new>` — move a binding and its nested subtree
+- `acct local set <profile> | --unbound` / `acct local clear` — root-local identity override
 - `acct unbind <dir>` — remove binding
 - `acct profile add|list|show|remove|token|ssh-key`
 - `acct status` / `acct whoami` — cwd resolution; status explains problems (what's wrong, fix commands, whether commit/push will go through)
@@ -79,8 +81,9 @@ acct doctor
 - `acct exec -- <cmd>` — run with profile `GH_TOKEN` (refuses dangerous `gh auth` mutations)
 - `acct clone <url>`
 - `acct enforce strict|warn|off`
-- `acct hook bash|zsh|fish|powershell`
-- `acct install` / `acct uninstall`
+- `acct hook bash|zsh|fish|powershell` / `acct_refresh`
+- `acct shell-env [--fish | --powershell]` / `acct wrap-install` / `acct wrap-path [--fish | --powershell]`
+- `acct install` / `acct install --repo` / `acct uninstall` — global chaining hooks by default; repo option for local overrides; uninstall restores recorded paths
 - `acct ssh-test <id>`
 
 ## Secrets / platforms
@@ -137,3 +140,17 @@ Point install at **`acct-sh`** on npm (the CLI command is `acct`).
 - Invariants: https://github.com/abdull-ah-med/acct/blob/main/docs/invariants.md
 - Contributor AGENTS.md: https://github.com/abdull-ah-med/acct/blob/main/AGENTS.md
 - CHANGELOG: https://github.com/abdull-ah-med/acct/blob/main/CHANGELOG.md
+
+## 0.2.0 behavior and upgrade notes
+
+Run `acct install` once after upgrading to regenerate scoped includes and v3 hooks. Existing profiles/bindings retain schema version 1. Use `acct install --repo` where a local hooksPath overrides global hooks. Previous hooks are chained, and uninstall restores their recorded paths.
+
+`acct whoami` exits 0 for match, 1 for mismatch, and 2 for unknown. Pre-push checks outgoing recorded identities and actual HTTPS/SSH authentication. Post-commit only chains; commits never pushed are not re-checked. Client hooks can be bypassed, so mandatory policy needs server-side controls.
+
+Raw gh only follows a folder through the shell hook, wrapper, or acct exec. Bash refreshes at the next prompt; use acct exec or the wrapper for `cd repo && gh …`. The gh shim passes unbound calls through silently; direct acct exec prints an unbound note.
+
+Offline doctor makes no API calls or gh token-value persistence. First-access plaintext-to-keychain migration is allowed in every process, including helper, offline doctor, and shell-env: it moves existing secrets and removes plaintext copies without changing token values or persisting gh tokens.
+
+A host-specific credential helper before acct's managed block is harmless; one after it is an override. `gh auth setup-git` can append such a section. Doctor reports it, and `acct install` re-appends the managed block.
+
+The website displays cumulative npm downloads since package creation through npm's latest complete day, fetched server-side and refreshed hourly. This counts package downloads, not unique developers.

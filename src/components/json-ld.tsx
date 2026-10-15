@@ -1,3 +1,4 @@
+import { faqs } from "@/lib/faq";
 import { siteConfig } from "@/lib/site";
 import { jsonLdText } from "@/lib/json-ld";
 
@@ -38,7 +39,7 @@ export function JsonLd() {
         url: siteConfig.url,
         downloadUrl: siteConfig.npm,
         installUrl: siteConfig.npm,
-        softwareVersion: "0.1.x",
+        softwareVersion: "0.2.0",
         license: "https://opensource.org/licenses/MIT",
         codeRepository: siteConfig.github,
         programmingLanguage: "TypeScript",
@@ -72,40 +73,11 @@ export function JsonLd() {
       {
         "@type": "FAQPage",
         "@id": `${siteConfig.url}/#faq`,
-        mainEntity: [
-          {
-            "@type": "Question",
-            name: "How do I install acct?",
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: "Run `npm install -g acct-sh`, then `acct` for the command list. Create a profile with `acct init` (--id, --user, --email, --name, --bind). Add a shell hook with eval \"$(acct hook zsh)\".",
-            },
-          },
-          {
-            "@type": "Question",
-            name: "Does acct replace gh auth switch?",
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: "Yes for directory-scoped work. acct injects GH_TOKEN from the OS keychain for the bound profile and does not call gh auth switch. Git HTTPS uses git-credential-acct; identity uses includeIf.",
-            },
-          },
-          {
-            "@type": "Question",
-            name: "Where are tokens stored?",
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: "In the OS keychain via @napi-rs/keyring (macOS Keychain, Windows Credential Manager, Linux Secret Service / libsecret). CI hosts may set ACCT_SECRET_BACKEND=file for an explicit plaintext secrets.json opt-in.",
-            },
-          },
-          {
-            "@type": "Question",
-            name: "How do I diagnose conflicts?",
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: "Run `acct doctor` (add --online to verify ambient GH_TOKEN against the cwd profile). It scans credential helpers, install blocks, orphan bindings, sticky tokens, and keyring availability.",
-            },
-          },
-        ],
+        mainEntity: faqs.map((item) => ({
+          "@type": "Question",
+          name: item.question,
+          acceptedAnswer: { "@type": "Answer", text: item.answer },
+        })),
       },
     ],
   };

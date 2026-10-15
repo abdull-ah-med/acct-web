@@ -108,11 +108,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
+      id="top"
       data-theme="bound"
       className={`${syne.variable} ${ibmPlexMono.variable} dark h-full`}
       style={bodyFontStyle}
     >
-      <body className="min-h-full grain">
+      <body className="min-h-full">
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
         <JsonLd />
         <SmoothScroll>{children}</SmoothScroll>
         <Toaster />

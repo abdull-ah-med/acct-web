@@ -25,13 +25,13 @@ export const docsGroups: CommandGroup[] = [
   {
     id: "start",
     label: "Start",
-    intro: "Install the package, then run bare acct for the tip sheet.",
+    intro: "Install the package, then run acct for guided setup.",
     commands: [
       {
         id: "acct",
         name: "acct",
         synopsis: "acct [--help] [--version]",
-        body: "With no arguments, prints the welcome tip sheet (npm hides postinstall output). Use --help for the full command list.",
+        body: "Running acct in a terminal opens guided setup, while non-interactive processes receive the tip sheet; --help lists every command.",
         example: `npm install -g acct-sh
 acct
 acct --help`,
@@ -41,7 +41,7 @@ acct --help`,
         name: "acct init",
         synopsis:
           "acct init --id <id> --user <githubUser> --email <email> --name <name> [options]",
-        body: "Create a profile, bind a directory tree, wire includeIf identity, and install enforce hooks. This is the usual first command after install.",
+        body: "Run without flags for guided setup, or provide the profile fields to create a profile, bind a directory tree, and install identity includes and global chaining hooks non-interactively.",
         example: `acct init \\
   --id work \\
   --user your-work-user \\
@@ -49,29 +49,54 @@ acct --help`,
   --name "Your Name" \\
   --bind ~/Work`,
         flags: [
-          { name: "--id <id>", required: true, body: "Profile id, e.g. work or personal." },
-          { name: "--user <githubUser>", required: true, body: "GitHub username for this profile." },
-          { name: "--email <email>", required: true, body: "Commit email (user.email)." },
-          { name: "--name <name>", required: true, body: "Commit name (user.name)." },
-          { name: "--host <host>", body: "GitHub host. Default github.com." },
-          { name: "--protocol <https|ssh>", body: "Preferred clone style. Default https." },
-          { name: "--bind <dir>", body: "Directory tree to bind. Default: current directory." },
+          {
+            name: "--id <id>",
+            required: true,
+            body: "Profile id, e.g. work or personal.",
+          },
+          {
+            name: "--user <githubUser>",
+            required: true,
+            body: "GitHub username for this profile.",
+          },
+          {
+            name: "--email <email>",
+            required: true,
+            body: "Commit email (user.email).",
+          },
+          {
+            name: "--name <name>",
+            required: true,
+            body: "Commit name (user.name).",
+          },
+          {
+            name: "--host <host>",
+            body: "Use this GitHub host, which defaults to github.com.",
+          },
+          {
+            name: "--protocol <https|ssh>",
+            body: "Choose the preferred clone protocol, which defaults to https.",
+          },
+          {
+            name: "--bind <dir>",
+            body: "Bind this directory tree, or use the current directory when omitted.",
+          },
           {
             name: "--import-gh",
-            body: "Seed the OS keychain from gh auth token --user. Optional — HTTPS and acct exec already follow gh for that user.",
+            body: "Optionally seed the OS keychain from gh auth token --user; HTTPS and acct exec already follow gh for that user.",
           },
           {
             name: "--global-hooks",
-            body: "Set core.hooksPath globally. Discouraged; replaces hooks in every repo.",
+            body: "Compatibility flag: installation already uses global chaining hooks by default.",
           },
           {
             name: "--force",
-            body: "Overwrite an existing non-acct core.hooksPath in the bind directory.",
+            body: "Compatibility flag: existing hooks are chained instead of overwritten.",
           },
         ],
         notes: [
           "New profiles start in strict enforce mode.",
-          "After init, add a shell hook so gh follows the directory on every cd.",
+          "After init, persist the shell hook in your startup file. Bash refreshes at the next prompt; use acct exec or the gh wrapper for cd followed immediately by gh.",
         ],
       },
     ],
@@ -86,7 +111,7 @@ acct --help`,
         name: "acct profile add",
         synopsis:
           "acct profile add --id <id> --user <githubUser> --email <email> --name <name> [options]",
-        body: "Create a profile without binding a folder. Bind it afterwards with acct bind.",
+        body: "Create a profile without binding a folder, then connect it to a directory with acct bind.",
         example: `acct profile add \\
   --id personal \\
   --user you-home \\
@@ -94,12 +119,25 @@ acct --help`,
   --name "Your Name"`,
         flags: [
           { name: "--id <id>", required: true, body: "Profile id." },
-          { name: "--user <githubUser>", required: true, body: "GitHub username." },
+          {
+            name: "--user <githubUser>",
+            required: true,
+            body: "GitHub username.",
+          },
           { name: "--email <email>", required: true, body: "Commit email." },
           { name: "--name <name>", required: true, body: "Commit name." },
-          { name: "--host <host>", body: "GitHub host. Default github.com." },
-          { name: "--protocol <https|ssh>", body: "Preferred protocol. Default https." },
-          { name: "--import-gh", body: "Import a token from gh into the OS keychain." },
+          {
+            name: "--host <host>",
+            body: "Use this GitHub host, which defaults to github.com.",
+          },
+          {
+            name: "--protocol <https|ssh>",
+            body: "Choose the preferred protocol, which defaults to https.",
+          },
+          {
+            name: "--import-gh",
+            body: "Import a token from gh into the OS keychain.",
+          },
         ],
       },
       {
@@ -113,14 +151,14 @@ acct --help`,
         id: "profile-show",
         name: "acct profile show",
         synopsis: "acct profile show <id>",
-        body: "Print one profile as JSON. Does not include the token.",
+        body: "Print one profile as JSON with its token omitted.",
         example: "acct profile show work",
       },
       {
         id: "profile-remove",
         name: "acct profile remove",
         synopsis: "acct profile remove <id>",
-        body: "Delete the profile, its stored token, and includeIf artifacts. Bindings that pointed at it should be unbound first.",
+        body: "Remove a profile after unbinding its directories. Secrets and SSH keys shared by other profiles are preserved.",
         example: "acct profile remove work",
       },
       {
@@ -137,7 +175,7 @@ printf '%s' "$PAT" | acct profile token work --stdin`,
           },
           {
             name: "--stdin",
-            body: "Read a PAT from stdin. Sets followGh: false so gh will not overwrite it.",
+            body: "Read a personal access token from stdin and set followGh to false so gh will not overwrite it.",
           },
         ],
         notes: [
@@ -148,16 +186,20 @@ printf '%s' "$PAT" | acct profile token work --stdin`,
       {
         id: "profile-ssh-key",
         name: "acct profile ssh-key",
-        synopsis: "acct profile ssh-key <id> (--generate | --path <path>) [--protocol https|ssh]",
-        body: "Generate an ed25519 key for the profile, or attach an existing private key. HTTPS isolation stays installed unless you pass --protocol.",
+        synopsis:
+          "acct profile ssh-key <id> (--generate | --path <path>) [--protocol https|ssh]",
+        body: "Generate an ed25519 key for the profile, or attach an existing private key. The scoped HTTPS helper stays installed for SSH profiles too.",
         example: `acct profile ssh-key work --generate
 acct profile ssh-key work --path ~/.ssh/id_work`,
         flags: [
-          { name: "--generate", body: "Create an ed25519 key. Defaults protocol to ssh." },
+          {
+            name: "--generate",
+            body: "Create an ed25519 key and select SSH as the preferred protocol.",
+          },
           { name: "--path <path>", body: "Attach an existing private key." },
           {
             name: "--protocol <https|ssh>",
-            body: "Set preferred protocol. Generate defaults to ssh if omitted.",
+            body: "Set the preferred protocol; generating a key defaults to ssh when this is omitted.",
           },
         ],
       },
@@ -166,13 +208,14 @@ acct profile ssh-key work --path ~/.ssh/id_work`,
   {
     id: "trees",
     label: "Trees",
-    intro: "Longest matching bound path wins. Leave the tree and that account stops applying.",
+    intro:
+      "Longest matching bound path wins. Leave the tree and that account stops applying.",
     commands: [
       {
         id: "bind",
         name: "acct bind",
         synopsis: "acct bind <dir> <profileId> [--enforce strict|warn|off]",
-        body: "Map a directory tree to an existing profile and refresh includeIf rules.",
+        body: "Map a canonical directory tree to a profile. Bind a repository root or a parent tree; a subdirectory inside a repository is rejected. Installed identity includes are refreshed automatically.",
         example: "acct bind ~/Personal personal",
         flags: [
           {
@@ -182,10 +225,37 @@ acct profile ssh-key work --path ~/.ssh/id_work`,
         ],
       },
       {
+        id: "rebind",
+        name: "acct rebind",
+        synopsis: "acct rebind <old> <new>",
+        body: "Move a binding and its nested binding subtree to a new canonical directory. Doctor reports missing or moved paths.",
+        example: "acct rebind ~/OldWork ~/Work",
+      },
+      {
+        id: "local-set",
+        name: "acct local set",
+        synopsis: "acct local set [profileId] [--unbound]",
+        body: "Set the repository-root .acct marker and matching local Git identity include. An empty profile explicitly unbinds the repository. A marker below the root is ignored and diagnosed.",
+        example: "acct local set work\nacct local set --unbound",
+        flags: [
+          {
+            name: "--unbound",
+            body: "Explicitly unbind this repository, even inside a bound parent tree.",
+          },
+        ],
+      },
+      {
+        id: "local-clear",
+        name: "acct local clear",
+        synopsis: "acct local clear",
+        body: "Remove the root-local marker and only acct's local identity include, returning to directory binding resolution.",
+        example: "acct local clear",
+      },
+      {
         id: "unbind",
         name: "acct unbind",
         synopsis: "acct unbind <dir>",
-        body: "Remove a directory → profile binding. The profile itself is kept.",
+        body: "Remove a directory’s profile binding while keeping the profile itself.",
         example: "acct unbind ~/Downloads",
       },
     ],
@@ -199,31 +269,36 @@ acct profile ssh-key work --path ~/.ssh/id_work`,
         id: "status",
         name: "acct status",
         synopsis: "acct status [--profile <id>]",
-        body: "Dump how cwd resolved: reason, binding, profile, identity, token presence, and the auth principal. If unhealthy, prints what is wrong, commands to run, and whether commit or push will go through. Exits 1 on error findings.",
+        body: "Show how the current directory resolves, including its binding, profile, identity, token presence, and authenticated account. When errors are found, explain the problem and suggested commands, indicate whether commit or push can proceed, and exit with code 1.",
         example: "acct status",
         flags: [
           {
             name: "--profile <id>",
-            body: "Show this profile for the gh principal. Does not rebind git HTTPS — directory / .acct still win.",
+            body: "Use this profile for the gh account while Git HTTPS continues to follow the directory binding or .acct marker.",
           },
         ],
         notes: [
-          "Ambient ACCT_PROFILE is ignored for git auth. A warning is printed if it disagrees with cwd.",
+          "Git authentication ignores ambient ACCT_PROFILE and prints a warning if it disagrees with the current directory.",
         ],
       },
       {
         id: "whoami",
         name: "acct whoami",
         synopsis: "acct whoami [--profile <id>]",
-        body: "One line: expected GitHub user vs actual login vs commit email. Prints unbound outside a bound tree. Exits 1 on mismatch.",
+        body: "Print expected GitHub user, actual login, and commit email. Exit codes: 0 for a match, 1 for a mismatch, 2 when the principal is unknown or the directory is unbound.",
         example: "acct whoami",
-        flags: [{ name: "--profile <id>", body: "Explicit profile for the gh plane." }],
+        flags: [
+          {
+            name: "--profile <id>",
+            body: "Explicit profile for the gh plane.",
+          },
+        ],
       },
       {
         id: "doctor",
         name: "acct doctor",
         synopsis: "acct doctor [--online]",
-        body: "Scan credential-helper competition, missing install blocks, orphan bindings, sticky GH_TOKEN, enforce fallthrough, and keyring availability. Also diagnoses the cwd profile when unhealthy.",
+        body: "Inspect helper order, hook coverage, stale shims, missing bindings, tokens, and keyring availability. The default offline check makes no API calls and does not persist token values from gh, although first access may migrate existing plaintext secrets.",
         example: `acct doctor
 acct doctor --online`,
         flags: [
@@ -245,19 +320,21 @@ acct doctor --online`,
   {
     id: "run",
     label: "Run",
-    intro: "Git HTTPS always follows the directory. These inject GH_TOKEN for gh only.",
+    intro:
+      "These commands supply GH_TOKEN for gh, while Git HTTPS continues to follow the directory binding.",
     commands: [
       {
         id: "exec",
         name: "acct exec",
-        synopsis: "acct exec [--profile <id>] [--allow-cross-profile] <command...>",
-        body: "Run a command with the profile GH_TOKEN. Refuses gh auth switch / login / token because those mutate global gh state. Git HTTPS still follows cwd / .acct, not --profile.",
+        synopsis:
+          "acct exec [--profile <id>] [--allow-cross-profile] <command...>",
+        body: "Run a command with the profile’s GH_TOKEN while Git HTTPS follows the directory binding or .acct marker. Commands that mutate global gh authentication, including gh auth switch, login, and token, are refused.",
         example: `acct exec gh pr list
 acct exec --profile work --allow-cross-profile gh api user`,
         flags: [
           {
             name: "--profile <id>",
-            body: "Inject this profile's token for gh. Does not rebind the git credential helper.",
+            body: "Supply this profile’s token for gh while leaving the Git credential helper’s directory resolution in place.",
           },
           {
             name: "--allow-cross-profile",
@@ -268,13 +345,13 @@ acct exec --profile work --allow-cross-profile gh api user`,
       {
         id: "clone",
         name: "acct clone",
-        synopsis: "acct clone <url> [dir] [--profile <id>]",
-        body: "git clone with the cwd profile's GH_TOKEN in the environment. Git credentials still follow the directory binding.",
+        synopsis: "acct clone <url> [git-clone-args...] [--profile <id>]",
+        body: "Clone with the selected profile environment. Git HTTPS credentials still follow the directory binding, not GH_TOKEN. Unknown profiles and strict worktree conflicts are refused.",
         example: "acct clone https://github.com/org/repo.git",
         flags: [
           {
             name: "--profile <id>",
-            body: "Inject GH_TOKEN for helpers that honor it. Git still uses the cwd binding.",
+            body: "Supply GH_TOKEN for helpers that honor it while Git continues to use the directory binding.",
           },
         ],
       },
@@ -283,33 +360,38 @@ acct exec --profile work --allow-cross-profile gh api user`,
   {
     id: "enforce",
     label: "Enforce",
-    intro: "strict blocks, warn prints, off does nothing. Local always beats global.",
+    intro:
+      "Choose whether identity mismatches block an operation, produce a warning, or receive no enforcement, with local settings taking precedence.",
     commands: [
       {
         id: "enforce-cmd",
         name: "acct enforce",
         synopsis: "acct enforce <strict|warn|off|on>",
-        body: "Set the default enforcement mode. on is an alias for strict. A binding can override this with acct bind --enforce.",
+        body: "Set the default enforcement mode, using on as an alias for strict, or override a specific binding with acct bind --enforce.",
         example: "acct enforce strict",
         notes: [
           "In strict, a missing profile token or mismatched gh principal blocks push.",
-          "A commit still uses includeIf name/email, not gh. Raw gh without acct exec can still be the wrong user — that is the leak risk.",
+          "Commits use the name and email selected by Git’s conditional includes, while unmanaged gh commands can still use another account.",
         ],
       },
       {
         id: "install-cmd",
         name: "acct install",
-        synopsis: "acct install [--global] [--force]",
-        body: "Wire includeIf git identity and set core.hooksPath on the current repo (local by default).",
+        synopsis: "acct install [--repo] [--global] [--force]",
+        body: "Wire scoped Git identity and global v3 chaining hooks. Use --repo for a repository with a local hooksPath override; its previous local path is baked into separate repository shims.",
         example: "acct install",
         flags: [
           {
+            name: "--repo",
+            body: "Install per-repository hooks that chain the previous local hooksPath.",
+          },
+          {
             name: "--global",
-            body: "Set core.hooksPath globally. Discouraged; replaces hooks in every repo.",
+            body: "Compatibility flag: installation already uses global chaining hooks by default.",
           },
           {
             name: "--force",
-            body: "Overwrite an existing non-acct core.hooksPath in this repo.",
+            body: "Compatibility flag: existing hooks are chained, not overwritten.",
           },
         ],
       },
@@ -317,10 +399,13 @@ acct exec --profile work --allow-cross-profile gh api user`,
         id: "uninstall",
         name: "acct uninstall",
         synopsis: "acct uninstall [--restore-backup]",
-        body: "Remove the acct-managed gitconfig block and unset global core.hooksPath. OS helpers (osxkeychain, wincred, libsecret) may still answer for github.com — doctor will say so.",
+        body: "Remove managed includes and restore recorded hook paths only where acct owns the shims. Per-repository shim directories are removed. Existing OS credential helpers can still answer for GitHub; review the uninstall warning.",
         example: "acct uninstall --restore-backup",
         flags: [
-          { name: "--restore-backup", body: "Restore the pre-acct gitconfig backup if one exists." },
+          {
+            name: "--restore-backup",
+            body: "Restore the pre-acct gitconfig backup if one exists.",
+          },
         ],
       },
     ],
@@ -328,13 +413,14 @@ acct exec --profile work --allow-cross-profile gh api user`,
   {
     id: "shell",
     label: "Shell",
-    intro: "The hook re-resolves from cwd on every prompt. Sticky ACCT_PROFILE is stripped.",
+    intro:
+      "The hook resolves the profile from the current directory on each prompt after stripping any previously exported ACCT_PROFILE.",
     commands: [
       {
         id: "hook",
         name: "acct hook",
         synopsis: "acct hook <bash|zsh|fish|powershell>",
-        body: "Print a shell hook. Eval it from your shell startup so cd rebinds env (or clears it when unbound).",
+        body: "Print a hook to load from your shell startup file so changing directories refreshes the profile environment or clears it outside bound folders.",
         example: `eval "$(acct hook zsh)"
 eval "$(acct hook bash)"
 acct hook fish | source
@@ -343,39 +429,47 @@ acct hook powershell | Out-String | Invoke-Expression`,
       {
         id: "shell-env",
         name: "acct shell-env",
-        synopsis: "acct shell-env [--powershell]",
-        body: "Print env exports for the cwd profile. Used by the shell hook; you rarely run this yourself.",
+        synopsis: "acct shell-env [--powershell | --fish]",
+        body: "Print environment exports for the current directory’s profile, which the shell hook normally handles for you.",
         example: "acct shell-env",
-        flags: [{ name: "--powershell", body: "Emit PowerShell syntax." }],
+        flags: [
+          { name: "--powershell", body: "Emit PowerShell syntax." },
+          { name: "--fish", body: "Emit native Fish syntax." },
+        ],
       },
       {
         id: "wrap-install",
         name: "acct wrap-install",
         synopsis: "acct wrap-install",
-        body: "Install optional PATH shims so gh is invoked as acct exec gh. Then add the wrap-path export to your shell.",
+        body: "Install optional PATH shims that invoke gh as acct exec gh, then add the wrap-path export to your shell.",
         example: `acct wrap-install
 eval "$(acct wrap-path)"`,
       },
       {
         id: "wrap-path",
         name: "acct wrap-path",
-        synopsis: "acct wrap-path [--powershell]",
-        body: "Print the PATH export for wrap shims. Installs the shims if they are missing.",
+        synopsis: "acct wrap-path [--powershell | --fish]",
+        body: "Print the PATH export for wrapper shims, installing them first if they are missing.",
         example: 'eval "$(acct wrap-path)"',
-        flags: [{ name: "--powershell", body: "Emit PowerShell syntax." }],
+        flags: [
+          { name: "--powershell", body: "Emit PowerShell syntax." },
+          { name: "--fish", body: "Emit native Fish syntax." },
+        ],
       },
     ],
   },
   {
     id: "internal",
     label: "Internal",
-    intro: "Called by git hooks. Do not run these by hand unless you are debugging.",
+    intro:
+      "Git hooks call these commands automatically; run them by hand only when debugging their behavior.",
     commands: [
       {
         id: "hook-run",
         name: "acct hook-run",
-        synopsis: "acct hook-run <pre-commit|pre-push>",
-        body: "Internal entry for enforce hooks. pre-commit checks commit identity; pre-push checks auth. On failure, prints the block message plus a status diagnosis.",
+        synopsis:
+          "acct hook-run <pre-commit|pre-merge-commit|pre-push> [remote] [url]",
+        body: "Pre-commit and pre-merge-commit check effective identity. Pre-push checks every outgoing recorded identity and the actual remote authentication. Post-commit only chains existing hooks; it has no hook-run entry.",
         example: "acct hook-run pre-push",
       },
     ],
@@ -383,10 +477,26 @@ eval "$(acct wrap-path)"`,
 ];
 
 export const resolutionSteps = [
-  { n: "1", title: "CLI --profile", body: "Explicit, process-local. Affects gh / status / exec. Does not rebind git HTTPS." },
-  { n: "2", title: "Nearest .acct", body: "Walks up from cwd. An empty profile in that file means unbound and wins over parent bindings." },
-  { n: "3", title: "Longest binding", body: "Directory trees from acct bind / init. More specific paths beat broader ones." },
-  { n: "4", title: "Unbound", body: "No acct identity. Strict mode blocks managed ops instead of guessing." },
+  {
+    n: "1",
+    title: "CLI --profile",
+    body: "An explicit profile applies to gh, status, and exec for the current process, while Git HTTPS still follows the directory.",
+  },
+  {
+    n: "2",
+    title: "Nearest .acct",
+    body: "acct searches upward from the Git worktree root, or the current directory outside Git, and ignores markers below the repository root. An empty profile explicitly unbinds the repository.",
+  },
+  {
+    n: "3",
+    title: "Longest binding",
+    body: "The longest canonical directory binding wins, with strict mode refusing conflicts between a worktree and its common Git directory.",
+  },
+  {
+    n: "4",
+    title: "Unbound",
+    body: "When no profile applies, strict mode blocks managed operations that require an identity.",
+  },
 ];
 
 export const envVars = [
@@ -396,27 +506,27 @@ export const envVars = [
   },
   {
     name: "ACCT_SECRET_BACKEND",
-    body: "Set file for plaintext secrets.json under the config dir (mode 0600). Use in CI / headless hosts without a keyring.",
+    body: "Set file on CI or headless hosts without a keyring to store plaintext secrets.json in the config directory with mode 0600.",
   },
   {
     name: "ACCT_CONFIG_DIR",
-    body: "Override the config directory. Default: ~/.config/acct, %APPDATA%\\acct on Windows, or $XDG_CONFIG_HOME/acct.",
+    body: "Override the config directory, which defaults to ~/.config/acct, %APPDATA%\\acct on Windows, or $XDG_CONFIG_HOME/acct.",
   },
   {
     name: "ACCT_PROFILE",
-    body: "Ambient profile id. Ignored for git credential helper and hooks. Directory / .acct win. The shell hook strips this before resolve.",
+    body: "The shell hook exports this profile id as a status hint, while the credential helper and hooks resolve from directory bindings or the repository-root .acct marker.",
   },
   {
     name: "ACCT_SKIP_POSTINSTALL",
-    body: "Skip the npm postinstall tip sheet. Also skipped in CI.",
+    body: "Skip the npm postinstall tip sheet, which is also suppressed automatically in CI.",
   },
   {
     name: "ACCT_NODE_PATH",
-    body: "Override the node binary baked into git hooks. Hooks otherwise use process.execPath, never which node.",
+    body: "Override the Node binary recorded in Git hooks, which otherwise use process.execPath rather than searching PATH.",
   },
   {
     name: "ACCT_DEBUG",
-    body: "Print sanitized debug lines to stderr. Token values are always [REDACTED].",
+    body: "Print sanitized debug lines to stderr with token values replaced by [REDACTED].",
   },
 ];
 
@@ -427,7 +537,7 @@ export function formatDocsMarkdown(siteUrl: string): string {
   const lines: string[] = [
     "# acct command reference",
     "",
-    "> Directory-scoped GitHub identity and auth. One folder. One GitHub account. One identity. No leaks.",
+    "> acct connects each folder to a GitHub account so commit identity and managed authentication follow your directory.",
     "",
     `- Human docs: ${docs}`,
     `- This file: ${md}`,
@@ -435,7 +545,7 @@ export function formatDocsMarkdown(siteUrl: string): string {
     "- CLI binary: `acct` (also installs `git-credential-acct`)",
     "- Repo: https://github.com/abdull-ah-med/acct",
     "",
-    "Official `gh` documents automatic switching by directory as out of scope. acct owns that gap.",
+    "acct adds directory-based account resolution around GitHub CLI’s authentication.",
     "",
     "Do not confuse acct with `gh auth switch` (global), git `user.name`/`user.email` alone (identity ≠ auth), or GitHub Apps.",
     "",
@@ -446,14 +556,14 @@ export function formatDocsMarkdown(siteUrl: string): string {
     "acct",
     "```",
     "",
-    "Bare `acct` prints the tip sheet. Then:",
+    "Bare `acct` opens guided setup in a terminal (non-TTY prints tips). For non-interactive setup:",
     "",
     "```bash",
     "acct init \\",
     "  --id work \\",
     "  --user your-work-user \\",
     "  --email you@company.com \\",
-    "  --name \"Your Name\" \\",
+    '  --name "Your Name" \\',
     "  --bind ~/Work",
     "",
     'eval "$(acct hook zsh)"',
@@ -461,9 +571,13 @@ export function formatDocsMarkdown(siteUrl: string): string {
     "",
     "`--import-gh` is optional on init. HTTPS and `acct exec` follow `gh auth token --user` for that profile. Use `--import-gh` to seed the keychain immediately, or `--stdin` for a PAT that must not track gh.",
     "",
+    "## Upgrading to 0.2.0",
+    "",
+    "Run `acct install` once after upgrading to regenerate scoped includes and v3 hooks. Profiles and bindings retain schema version 1. Use `acct install --repo` for a local hooksPath override. Existing hooks are chained; uninstall restores recorded paths.",
+    "",
     "## Resolution order",
     "",
-    "How cwd picks an account. Local always wins. Ambient `ACCT_PROFILE` does not override git HTTPS or hooks.",
+    "acct resolves a profile from the directory and root-local marker; ambient `ACCT_PROFILE` does not override Git HTTPS credentials or hooks.",
     "",
   ];
 
@@ -473,14 +587,21 @@ export function formatDocsMarkdown(siteUrl: string): string {
 
   lines.push(
     "",
-    "Repo-local `.acct` is YAML `{ profile: work }`. An empty `profile` means this tree is unbound, even inside a bound parent.",
+    "Repository-root `.acct` is YAML `{ profile: work }`. An empty `profile` means this tree is unbound, even inside a bound parent.",
     "",
   );
 
   for (const group of docsGroups) {
     lines.push(`## ${group.label}`, "", group.intro, "");
     for (const command of group.commands) {
-      lines.push(`### \`${command.name}\``, "", `\`${command.synopsis}\``, "", command.body, "");
+      lines.push(
+        `### \`${command.name}\``,
+        "",
+        `\`${command.synopsis}\``,
+        "",
+        command.body,
+        "",
+      );
       lines.push("```bash", command.example, "```", "");
       if (command.flags?.length) {
         lines.push("Flags:", "");

@@ -17,7 +17,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/docs",
     types: {
-      "text/markdown": [{ url: "/docs.md", title: "Command reference (markdown)" }],
+      "text/markdown": [
+        { url: "/docs.md", title: "Command reference (markdown)" },
+      ],
       "text/plain": [
         { url: "/llms.txt", title: "LLM index" },
         { url: "/llms-full.txt", title: "LLM full context" },
@@ -71,7 +73,7 @@ export default function DocsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdText(articleLd) }}
       />
-      <main className="overflow-x-clip px-4 pt-28 pb-20 sm:px-6 md:pt-32 md:pb-28">
+      <main id="main-content" className="docs-main page-width">
         <DocsView />
       </main>
       <Footer />
