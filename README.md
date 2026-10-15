@@ -65,3 +65,11 @@ python3 tests/browser/site_ui.py
 ```
 
 Set `ACCT_WEB_BASE_URL` to test a production preview and `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to use an existing browser binary.
+
+## IDEs and editors
+
+acct applies to tools that use the Git installation and configuration where it was installed. JetBrains IDEs need “Use credential helper” enabled under Settings → Version Control → Git for HTTPS operations; their own GitHub sign-in and API integrations remain separate. Zed uses Git for repository operations and disables hooks and credential helpers in untrusted projects. Vim and Neovim can invoke the configured Git from shell commands or Git plugins, and IDE tasks can use `acct exec gh …` when they do not load shell startup files.
+
+The compatibility strip includes agent and editor brands with their original colors. Asset sources and attribution are recorded in [public/brands/README.md](public/brands/README.md). The logos identify compatible workflows rather than vendor endorsements.
+
+References: [JetBrains credential-helper setting](https://youtrack.jetbrains.com/articles/SUPPORT-A-2678/Remote-git-operations-in-the-IDE-override-credential-helper-option), [Zed Git integration](https://zed.dev/docs/git), and [Vim shell commands](https://vimhelp.org/usr_21.txt.html#21.2).

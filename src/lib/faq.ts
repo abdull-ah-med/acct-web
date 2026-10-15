@@ -29,4 +29,11 @@ export const faqs = [
     answer:
       "Client hooks provide advisory checks because they can be bypassed, so mandatory enforcement requires server-side rules. Pre-commit checks effective identity, and pre-push re-checks every outgoing commit and the authenticated account. Post-commit only chains existing hooks, which means commits in repositories that are never pushed are not re-checked.",
   },
+  // JetBrains documents its credential-helper override and opt-in here:
+  // https://youtrack.jetbrains.com/articles/SUPPORT-A-2678/Remote-git-operations-in-the-IDE-override-credential-helper-option
+  {
+    question: "Does acct work with IDEs and editors?",
+    answer:
+      "acct applies to Git operations from IDEs and editors that use the Git installation you configured with acct. In JetBrains IDEs, enable Use credential helper under Settings → Version Control → Git for HTTPS authentication. Vim and Neovim can use it through shell commands or Git plugins that invoke that Git installation. An IDE’s own GitHub sign-in stays separate, and gh commands in IDE tasks should use acct exec or the shell integration.",
+  },
 ];

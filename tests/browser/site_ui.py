@@ -138,7 +138,7 @@ class SiteUI(unittest.TestCase):
 
     def test_folder_preview_install_copy_and_live_package_data(self):
         self.home()
-        expect(self.page.get_by_role('region', name='Works with all of your coding agents')).to_be_visible()
+        expect(self.page.get_by_role('region', name='Works with your coding agents and IDEs')).to_be_visible()
         expect(self.page.locator('#hero').get_by_role('link', name=re.compile(r'^[\d,]+\+ downloads$'))).to_be_visible(timeout=20000)
         print('LIVE_DOWNLOADS', self.page.locator('.hero-downloads').inner_text())
         self.page.get_by_role('button', name='Select Personal folder').click()
@@ -255,6 +255,37 @@ class SiteUI(unittest.TestCase):
         expect(group.locator('.release-entry').first).to_be_visible()
         trigger.click()
         expect(group.locator('.disclosure-content').first).not_to_be_visible()
+
+    def test_editor_logos_load_and_ide_setup_is_reachable(self):
+        self.home()
+        strip = self.page.get_by_role('region', name='Works with your coding agents and IDEs')
+        expect(strip).to_be_visible()
+        for name in ['JetBrains', 'Zed', 'Vim', 'Neovim']:
+            logo = strip.get_by_role('img', name=name, exact=True)
+            expect(logo).to_be_visible()
+            self.assertTrue(logo.evaluate('image => image.complete && image.naturalWidth > 0'), f'{name} logo failed to load')
+        strip.get_by_role('link', name='JetBrains', exact=True).focus()
+        self.assertEqual(self.page.locator('.agent-marquee-track').evaluate('track => getComputedStyle(track).animationPlayState'), 'paused')
+        self.page.emulate_media(reduced_motion='reduce')
+        self.page.set_viewport_size({'width': 390, 'height': 844})
+        for name in ['JetBrains', 'Zed', 'Vim', 'Neovim']:
+            box = strip.get_by_role('img', name=name, exact=True).bounding_box()
+            self.assertGreaterEqual(box['x'], 0)
+            self.assertLessEqual(box['x'] + box['width'], 390)
+        self.page.get_by_role('button', name='Does acct work with IDEs and editors?', exact=True).click()
+        answer = self.page.get_by_role('region', name='Does acct work with IDEs and editors?', exact=True)
+        expect(answer).to_be_visible()
+        expect(answer).to_contain_text('Use credential helper')
+        self.page.set_viewport_size({'width': 1440, 'height': 1000})
+        self.page.goto(BASE + '/docs', wait_until='load')
+        self.page.get_by_role('navigation', name='On this page').get_by_role('link', name='IDEs and editors', exact=True).click()
+        expect(self.page.locator('#editors')).to_be_focused()
+        expect(self.page.locator('#editors')).to_contain_text('Use credential helper')
+        source = self.page.locator('#editors').get_by_role('link', name='JetBrains Git settings', exact=True)
+        expect(source).to_have_attribute('href', 'https://youtrack.jetbrains.com/articles/SUPPORT-A-2678/Remote-git-operations-in-the-IDE-override-credential-helper-option')
+        markdown = self.page.request.get(BASE + '/docs.md')
+        self.assertEqual(markdown.status, 200)
+        self.assertIn('Use credential helper', markdown.text())
 
     def test_agent_logos_keep_original_colors_and_hover_feedback(self):
         self.home()

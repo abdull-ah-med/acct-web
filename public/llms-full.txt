@@ -154,3 +154,7 @@ Offline doctor makes no API calls or gh token-value persistence. First-access pl
 A host-specific credential helper before acct's managed block is harmless; one after it is an override. `gh auth setup-git` can append such a section. Doctor reports it, and `acct install` re-appends the managed block.
 
 The website displays cumulative npm downloads since package creation through npm's latest complete day, fetched server-side and refreshed hourly. This counts package downloads, not unique developers.
+
+## IDEs and editors
+
+acct applies to Git operations from tools that use the Git installation configured with acct. For JetBrains HTTPS operations, enable “Use credential helper” under Settings → Version Control → Git. Zed disables Git hooks and credential helpers in untrusted projects, so acct’s managed Git operations need a trusted project. IDE GitHub sign-ins and API integrations remain separate, while gh commands in tasks should use acct exec or load the shell integration. Vim and Neovim can use the setup through shell commands or Git plugins that invoke the configured Git.

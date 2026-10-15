@@ -3,12 +3,26 @@
  * brand kit / press page / Wikimedia (sourced from the vendor). No
  * generated marks, no substitute typefaces.
  */
-const AGENTS = [
+const TOOLS = [
   {
     name: "Cursor",
     src: "/brands/cursor.svg",
     height: 22,
     invert: false,
+  },
+  {
+    name: "JetBrains",
+    src: "/brands/jetbrains.svg",
+    height: 28,
+    invert: false,
+    href: "https://www.jetbrains.com/",
+  },
+  {
+    name: "Zed",
+    src: "/brands/zed.svg",
+    height: 28,
+    invert: false,
+    href: "https://zed.dev/",
   },
   {
     name: "Antigravity",
@@ -43,6 +57,20 @@ const AGENTS = [
     invert: false,
   },
   {
+    name: "Vim",
+    src: "/brands/vim.svg",
+    height: 34,
+    invert: false,
+    href: "https://www.vim.org/",
+  },
+  {
+    name: "Neovim",
+    src: "/brands/neovim.svg",
+    height: 30,
+    invert: false,
+    href: "https://neovim.io/",
+  },
+  {
     name: "DeepSeek",
     src: "/brands/deepseek.svg",
     height: 22,
@@ -68,7 +96,7 @@ const AGENTS = [
   },
 ] as const;
 
-function BrandMark({ agent }: { agent: (typeof AGENTS)[number] }) {
+function BrandMark({ agent }: { agent: (typeof TOOLS)[number] }) {
   if ("kind" in agent && agent.kind === "kiro") {
     return (
       <span className="inline-flex items-center gap-2" aria-label="Kiro">
@@ -113,7 +141,7 @@ function BrandMark({ agent }: { agent: (typeof AGENTS)[number] }) {
     );
   }
 
-  const item = agent as Extract<(typeof AGENTS)[number], { src: string }>;
+  const item = agent as Extract<(typeof TOOLS)[number], { src: string }>;
   return (
     <img
       src={item.src}
@@ -133,12 +161,24 @@ function Track({ copy }: { copy: number }) {
       className="flex shrink-0 items-center gap-12 pr-12 sm:gap-16 sm:pr-16"
       aria-hidden={copy > 0 ? true : undefined}
     >
-      {AGENTS.map((agent) => (
+      {TOOLS.map((agent) => (
         <li
           key={`${copy}-${agent.name}`}
           className="agent-mark flex shrink-0 items-center opacity-90 transition-[opacity,transform] duration-200 ease-out hover:opacity-100 hover:-translate-y-0.5"
         >
-          <BrandMark agent={agent} />
+          {"href" in agent ? (
+            <a
+              href={agent.href}
+              target="_blank"
+              rel="noreferrer"
+              tabIndex={copy > 0 ? -1 : undefined}
+              className="inline-flex items-center rounded-sm outline-offset-8 focus-visible:outline-2 focus-visible:outline-white/70"
+            >
+              <BrandMark agent={agent} />
+            </a>
+          ) : (
+            <BrandMark agent={agent} />
+          )}
         </li>
       ))}
     </ul>
@@ -150,10 +190,10 @@ export function AgentMarquee() {
     <div
       className="agent-marquee relative z-10 w-full pb-8 pt-4 sm:pb-10"
       role="region"
-      aria-label="Works with all of your coding agents"
+      aria-label="Works with your coding agents and IDEs"
     >
       <p className="agent-marquee-label mb-5 px-4 text-center text-[0.68rem] font-medium tracking-[0.12em] text-base-content/40 sm:text-xs">
-        Works with all of your coding agents
+        Works with your coding agents and IDEs
       </p>
       <div className="agent-marquee-fade overflow-hidden">
         <div className="agent-marquee-track flex w-max">

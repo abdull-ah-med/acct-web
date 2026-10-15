@@ -76,6 +76,7 @@ export function DocsView() {
     .filter((group) => group.commands.length);
   const toc = [
     { id: "concepts", label: "Overview" },
+    { id: "editors", label: "IDEs and editors" },
     ...groups.map((group) => ({ id: group.id, label: group.label })),
     { id: "env", label: "Environment" },
   ];
@@ -115,6 +116,39 @@ export function DocsView() {
             </li>
           ))}
         </ol>
+      </section>
+      <section className="docs-group" id="editors">
+        <h2>Use acct in your IDE or editor.</h2>
+        <p>
+          Git identity and managed authentication follow your folder when the
+          IDE uses the Git installation where you configured acct. Zed’s Git
+          integration uses Git for repository operations, while Vim and Neovim
+          can use the same setup through shell commands or Git plugins that
+          invoke that Git installation.
+        </p>
+        <p>
+          In JetBrains IDEs, select your Git executable and enable{" "}
+          <strong>Use credential helper</strong> under Settings → Version
+          Control → Git so HTTPS operations use acct’s helper.
+        </p>
+        <a
+          className="text-link editor-settings-link"
+          href="https://youtrack.jetbrains.com/articles/SUPPORT-A-2678/Remote-git-operations-in-the-IDE-override-credential-helper-option"
+          target="_blank"
+          rel="noreferrer"
+        >
+          JetBrains Git settings
+        </a>
+        <p>
+          Zed disables Git hooks and credential helpers in untrusted projects,
+          so the project must be trusted for acct’s managed Git operations.
+        </p>
+        <p>
+          An IDE’s own GitHub account and pull-request integration stay
+          separate. For gh commands in an IDE task that does not load your shell
+          hook, use acct exec to resolve the folder’s profile explicitly.
+        </p>
+        <CopyBlock code={"acct status\nacct exec gh pr list"} />
       </section>
       {groups.length === 0 && (
         <p className="docs-empty" role="status">
